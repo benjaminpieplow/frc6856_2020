@@ -18,3 +18,19 @@ class TankDrive {
     WPI_VictorSPX* pVictorSPX[2];
 
 };
+
+class AdvancedDrive {
+    public:
+    AdvancedDrive(int talonCANID, int victorCANID);
+    ~AdvancedDrive();
+
+    void SetPWM(double power);
+
+    void InitVelocityControl();
+
+    void SetTargetVelocity(double targetVel);
+
+    private:
+    WPI_TalonSRX* pTalonSRX;
+    WPI_VictorSPX* pVictorSPX;
+};

@@ -32,6 +32,10 @@ class Robot : public frc::TimedRobot {
   const std::string kAutoNameCustom = "My Auto";
   std::string m_autoSelected;
 
-  TankDrive m_pTankDrive;
+
+//  TankDrive m_pTankDrive;
   ControllerInput* m_pPrimaryController;
+
+  AdvancedDrive* m_pLeftTrack;
+  AdvancedDrive* m_pRightTrack;
 };

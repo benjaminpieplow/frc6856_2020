@@ -16,6 +16,12 @@ void Robot::RobotInit() {
   m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
   frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
+  this->m_pLeftTrack = new AdvancedDrive(2, 1);
+  this->m_pRightTrack = new AdvancedDrive(8, 4);
+
+  this->m_pLeftTrack->InitVelocityControl();
+  this->m_pRightTrack->InitVelocityControl();
+
   //Initialize Objects
   //ToDo: Make this a map file
   this->m_pPrimaryController = new ControllerInput(0);
@@ -66,7 +72,20 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-  m_pTankDrive.setTankDrivePower((0.75 * m_pPrimaryController->getJoyY()), (m_pPrimaryController->getJoyX() * 0.45));
+
+    double lPower = 0.0;
+    double rPower = 0.0;
+
+    double forwardSpeed = m_pPrimaryController->getJoyY() * 0.75 * -1;
+    double turnSpeed = m_pPrimaryController->getJoyX() * 0.45;
+
+    rPower = (forwardSpeed + turnSpeed);
+    lPower = ( -forwardSpeed + turnSpeed);
+
+  this->m_pRightTrack->SetTargetVelocity(rPower * 4096);
+  this->m_pLeftTrack->SetTargetVelocity(lPower * 4096);
+//  m_pTankDrive.setTankDrivePower((0.75 * m_pPrimaryController->getJoyY()), (m_pPrimaryController->getJoyX() * 0.45));
+
 }
 
 void Robot::TestPeriodic() {}
