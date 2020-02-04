@@ -16,15 +16,15 @@ void Robot::RobotInit() {
   m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
   frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
+  //Initialize Objects
+  //ToDo: Make this a map file
+  this->m_pPrimaryController = new ControllerInput(0);
+
   this->m_pLeftTrack = new AdvancedDrive(2, 1);
   this->m_pRightTrack = new AdvancedDrive(8, 4);
 
   this->m_pLeftTrack->InitVelocityControl();
   this->m_pRightTrack->InitVelocityControl();
-
-  //Initialize Objects
-  //ToDo: Make this a map file
-  this->m_pPrimaryController = new ControllerInput(0);
 }
 
 /**
