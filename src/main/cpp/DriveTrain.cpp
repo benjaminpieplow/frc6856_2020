@@ -95,6 +95,6 @@ void AdvancedDrive::SetTargetVelocity(double targetVel) {
     this->pTalonSRX->Set(ControlMode::Velocity, targetVel);
 }
 
-void AdvancedDrive::SetTargetMotionProfileVelocity(double target) {
+void AdvancedDrive::SetTargetMotionProfileTarget(double target) {
     this->pTalonSRX->Set(ControlMode::MotionMagic, target);
 }

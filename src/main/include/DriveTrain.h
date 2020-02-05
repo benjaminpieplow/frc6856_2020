@@ -31,7 +31,7 @@ class AdvancedDrive {
 
     void SetTargetVelocity(double targetVel);
 
-    void SetTargetMotionProfileVelocity(double target);
+    void SetTargetMotionProfileTarget(double target);
 
     private:
     WPI_TalonSRX* pTalonSRX;

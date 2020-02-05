@@ -73,20 +73,31 @@ void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
 
-    double lPower = 0.0;
-    double rPower = 0.0;
+  /**
+   * This line will take raw input from the joystick and pass it to the motor controllers;
+   * Kept here as LAST RESORT in case motion control breaks
+   * m_pTankDrive.setTankDrivePower((0.75 * m_pPrimaryController->getJoyY()), (m_pPrimaryController->getJoyX() * 0.45));
+   */
 
-    //double forwardSpeed = m_pPrimaryController->getJoyY() * 0.45 * -1;
-    double forwardSpeed = m_pPrimaryController->getJoyY() * 5 * -1;
-    double turnSpeed = m_pPrimaryController->getJoyX() * 0.25;
+  //Drive Ratio
+  double lPower = 0.0;
+  double rPower = 0.0;
 
-    rPower = (forwardSpeed + turnSpeed);
-    lPower = ( -forwardSpeed + turnSpeed);
+  //This ratio works for the drivers (NOTE: robot direction is inverted because it moves 'nicer' with the battery in the back)
+  double forwardSpeed = m_pPrimaryController->getJoyY() * 0.45 * -1;
+  double turnSpeed = m_pPrimaryController->getJoyX() * 0.25;
 
-  this->m_pRightTrack->SetTargetMotionProfileVelocity(rPower * 4096);
-  this->m_pLeftTrack->SetTargetMotionProfileVelocity(lPower * 4096);
-  //this->m_pRightTrack->SetPWM(0);
-//  m_pTankDrive.setTankDrivePower((0.75 * m_pPrimaryController->getJoyY()), (m_pPrimaryController->getJoyX() * 0.45));
+  //Basic tank-drive algorithm
+  rPower = (forwardSpeed + turnSpeed);
+  lPower = (-forwardSpeed + turnSpeed);
+
+  //Currently, this uses only kF (feed forward gain) to apply power on the left track, since the encoder is broken
+  this->m_pRightTrack->SetTargetVelocity(rPower * 4096);
+  this->m_pLeftTrack->SetTargetVelocity(lPower * 4096);
+
+  //If testing encoders, use motion profiles to servo to position
+//  this->m_pRightTrack->SetTargetMotionProfileTarget(rPower * 4096 * 5);
+//  this->m_pLeftTrack->SetTargetMotionProfileTarget(lPower * 4096 * 5);
 
 }
 
