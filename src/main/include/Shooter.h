@@ -29,17 +29,17 @@ class Shooter {
 
     private:
     //Is the mechanism enabled?
-    bool pShooterEnabled = false;
+    bool mShooterEnabled = false;
     //Is the shooter ready?
-    bool pShooterReady = false;
+    bool mShooterReady = false;
     //Is the shooter underspeed?
-    bool pShooterUnderspeed = false;
+    bool mShooterUnderspeed = false;
     //Is the shooter overspeed?
-    bool pShooterOverspeed = false;
+    bool mShooterOverspeed = false;
 
     //Target RPM
-    double pShooterTargetRPM = 3000;
+    double mShooterTargetRPM = 3000;
     
     //Shooter Motor
-    WPI_TalonSRX* pShooterMotor;
+    WPI_TalonSRX* m_pShooterMotor;
 };

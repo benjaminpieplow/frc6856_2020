@@ -76,14 +76,16 @@ void Robot::TeleopPeriodic() {
     double lPower = 0.0;
     double rPower = 0.0;
 
-    double forwardSpeed = m_pPrimaryController->getJoyY() * 0.75 * -1;
-    double turnSpeed = m_pPrimaryController->getJoyX() * 0.45;
+    //double forwardSpeed = m_pPrimaryController->getJoyY() * 0.45 * -1;
+    double forwardSpeed = m_pPrimaryController->getJoyY() * 5 * -1;
+    double turnSpeed = m_pPrimaryController->getJoyX() * 0.25;
 
     rPower = (forwardSpeed + turnSpeed);
     lPower = ( -forwardSpeed + turnSpeed);
 
-  this->m_pRightTrack->SetTargetVelocity(rPower * 4096);
-  this->m_pLeftTrack->SetTargetVelocity(lPower * 4096);
+  this->m_pRightTrack->SetTargetMotionProfileVelocity(rPower * 4096);
+  this->m_pLeftTrack->SetTargetMotionProfileVelocity(lPower * 4096);
+  //this->m_pRightTrack->SetPWM(0);
 //  m_pTankDrive.setTankDrivePower((0.75 * m_pPrimaryController->getJoyY()), (m_pPrimaryController->getJoyX() * 0.45));
 
 }

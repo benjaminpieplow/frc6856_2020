@@ -41,16 +41,17 @@ void TankDrive::setTankDrivePower(double forwardSpeed, double turnSpeed)
 }
 
 
+
 AdvancedDrive::AdvancedDrive(int talonCANID, int victorCANID) {
-    pTalonSRX = new WPI_TalonSRX(talonCANID);
-    pVictorSPX = new WPI_VictorSPX(victorCANID);
+    this->pTalonSRX = new WPI_TalonSRX(talonCANID);
+    this->pVictorSPX = new WPI_VictorSPX(victorCANID);
 
     this->pTalonSRX->ConfigFactoryDefault();
     this->pVictorSPX->ConfigFactoryDefault();
 
     this->pTalonSRX->ConfigVoltageCompSaturation(10,10);
 
-    this->pVictorSPX->Follow(*pTalonSRX);
+    this->pVictorSPX->Follow(*this->pTalonSRX);
 }
 
 void AdvancedDrive::SetPWM(double power) {
@@ -58,7 +59,8 @@ void AdvancedDrive::SetPWM(double power) {
 }
 
 void AdvancedDrive::InitVelocityControl() {
-    this->pTalonSRX->ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Relative, 0, 10);
+    this->pTalonSRX->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
+    //this->pTalonSRX->ConfigSelectedFeedbackCoefficient();
     this->pTalonSRX->SetSensorPhase(false);
     this->pTalonSRX->SetInverted(false);
     this->pTalonSRX->SetStatusFramePeriod(StatusFrameEnhanced::Status_13_Base_PIDF0, 10, 10);
@@ -73,13 +75,13 @@ void AdvancedDrive::InitVelocityControl() {
     //Set PIDs
     this->pTalonSRX->SelectProfileSlot(0, 0);
     this->pTalonSRX->Config_kF(0, 0.3, 10);
-    this->pTalonSRX->Config_kP(0, 0.6, 10); //LAST: 0.4
+    this->pTalonSRX->Config_kP(0, 0.8, 10); //LAST: 0.4
     this->pTalonSRX->Config_kI(0, 0.0, 10); //LAST: 0.0
     this->pTalonSRX->Config_kD(0, 6.0, 10); //LAST: 0.0
 
     //Set Accel and Cruise Velocity
-    this->pTalonSRX->ConfigMotionCruiseVelocity(500, 10);
-    this->pTalonSRX->ConfigMotionAcceleration(1500, 10);
+    this->pTalonSRX->ConfigMotionCruiseVelocity(1000, 10);
+    this->pTalonSRX->ConfigMotionAcceleration(800, 10);
 
     this->pTalonSRX->ConfigVoltageCompSaturation(10, 10);
     this->pVictorSPX->ConfigVoltageCompSaturation(10, 10);
@@ -91,4 +93,8 @@ void AdvancedDrive::InitVelocityControl() {
 
 void AdvancedDrive::SetTargetVelocity(double targetVel) {
     this->pTalonSRX->Set(ControlMode::Velocity, targetVel);
+}
+
+void AdvancedDrive::SetTargetMotionProfileVelocity(double target) {
+    this->pTalonSRX->Set(ControlMode::MotionMagic, target);
 }

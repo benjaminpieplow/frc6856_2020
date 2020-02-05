@@ -16,8 +16,9 @@ class TankDrive {
     private:
     WPI_TalonSRX* pTalonSRX[2];
     WPI_VictorSPX* pVictorSPX[2];
-
 };
+
+
 
 class AdvancedDrive {
     public:
@@ -29,6 +30,8 @@ class AdvancedDrive {
     void InitVelocityControl();
 
     void SetTargetVelocity(double targetVel);
+
+    void SetTargetMotionProfileVelocity(double target);
 
     private:
     WPI_TalonSRX* pTalonSRX;

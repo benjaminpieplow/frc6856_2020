@@ -3,23 +3,23 @@
 
 Shooter::Shooter(int CANID) {
 
-    pShooterMotor = new WPI_TalonSRX(CANID);
+    m_pShooterMotor = new WPI_TalonSRX(CANID);
 
-    this->pShooterMotor->ConfigFactoryDefault();
+    this->m_pShooterMotor->ConfigFactoryDefault();
 
-    this->pShooterMotor->ConfigVoltageCompSaturation(10,10);
+    this->m_pShooterMotor->ConfigVoltageCompSaturation(10,10);
 
-    this->pShooterMotor->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
-    this->pShooterMotor->SetSensorPhase(false);
-    this->pShooterMotor->SetInverted(false);
-    this->pShooterMotor->SetStatusFramePeriod(StatusFrameEnhanced::Status_13_Base_PIDF0, 10, 10);
-    this->pShooterMotor->SetStatusFramePeriod(StatusFrameEnhanced::Status_10_MotionMagic, 10, 10);
+    this->m_pShooterMotor->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
+    this->m_pShooterMotor->SetSensorPhase(false);
+    this->m_pShooterMotor->SetInverted(false);
+    this->m_pShooterMotor->SetStatusFramePeriod(StatusFrameEnhanced::Status_13_Base_PIDF0, 10, 10);
+    this->m_pShooterMotor->SetStatusFramePeriod(StatusFrameEnhanced::Status_10_MotionMagic, 10, 10);
 
     //Set Maximums and Targets
-    this->pShooterMotor->ConfigNominalOutputForward(0, 10);
-    this->pShooterMotor->ConfigNominalOutputReverse(0, 10);
-    this->pShooterMotor->ConfigPeakOutputForward(1, 10);
-    this->pShooterMotor->ConfigPeakOutputReverse(-1, 10);
+    this->m_pShooterMotor->ConfigNominalOutputForward(0, 10);
+    this->m_pShooterMotor->ConfigNominalOutputReverse(0, 10);
+    this->m_pShooterMotor->ConfigPeakOutputForward(1, 10);
+    this->m_pShooterMotor->ConfigPeakOutputReverse(-1, 10);
 
     //Set PIDs
     /**
@@ -31,32 +31,32 @@ Shooter::Shooter(int CANID) {
      * Also,
      * TODO: Tune PIDs
      */
-    this->pShooterMotor->SelectProfileSlot(0, 0);
-    this->pShooterMotor->Config_kF(0, 0.3, 10);
-    this->pShooterMotor->Config_kP(0, 0.1, 10); //LAST: 0.1
-    this->pShooterMotor->Config_kI(0, 0.0, 10); //LAST: 0.0
-    this->pShooterMotor->Config_kD(0, 0.0, 10); //LAST: 0.0
+    this->m_pShooterMotor->SelectProfileSlot(0, 0);
+    this->m_pShooterMotor->Config_kF(0, 0.3, 10);
+    this->m_pShooterMotor->Config_kP(0, 0.1, 10); //LAST: 0.1
+    this->m_pShooterMotor->Config_kI(0, 0.0, 10); //LAST: 0.0
+    this->m_pShooterMotor->Config_kD(0, 0.0, 10); //LAST: 0.0
 
     //Set Accel and Cruise Velocity
     //Used for Motion Magic, is worth investigating if slamming to RPM angers the integral accumulator, will disable for now
-    //this->pShooterMotor->ConfigMotionCruiseVelocity(500, 10);
-    //this->pShooterMotor->ConfigMotionAcceleration(1500, 10);
+    //this->m_pShooterMotor->ConfigMotionCruiseVelocity(500, 10);
+    //this->m_pShooterMotor->ConfigMotionAcceleration(1500, 10);
 
     //Get that little bit of juice back
-    this->pShooterMotor->Set(NeutralMode::Brake);
+    this->m_pShooterMotor->Set(NeutralMode::Brake);
 
 }
 
 void Shooter::EnableShooter() {
-    this->pShooterEnabled = true;
+    this->mShooterEnabled = true;
 }
 
 void Shooter::SetTargetVelocity(double targetRPM) {
-    this->pShooterTargetRPM = targetRPM;
+    this->mShooterTargetRPM = targetRPM;
     this->SetTargetVelocity();
 }
 
 void Shooter::SetTargetVelocity() {
-    double targetVelocity = (this->pShooterTargetRPM * this->encoderUnitsPerRevolution) / 60;
-    this->pShooterMotor->Set(ControlMode::Velocity, targetVelocity);
+    double targetVelocity = (this->mShooterTargetRPM * this->encoderUnitsPerRevolution) / 60;
+    this->m_pShooterMotor->Set(ControlMode::Velocity, targetVelocity);
 }
