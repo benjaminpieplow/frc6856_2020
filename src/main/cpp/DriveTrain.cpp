@@ -18,6 +18,7 @@ TankDrive::TankDrive()
         this->pVictorSPX[i]->ConfigVoltageCompSaturation(10, 10);
         this->pTalonSRX[i]->ConfigFactoryDefault(10);
         this->pTalonSRX[i]->ConfigVoltageCompSaturation(10, 10);
+        this->pVictorSPX[i]->Follow(*this->pTalonSRX[i]);
     }
 
 }
@@ -35,10 +36,11 @@ void TankDrive::setTankDrivePower(double forwardSpeed, double turnSpeed)
     rPower = ( forwardSpeed + turnSpeed );
     this->pTalonSRX[0]->Set(ControlMode::PercentOutput, lPower);
     this->pTalonSRX[1]->Set(ControlMode::PercentOutput, rPower);
-    this->pVictorSPX[0]->Set(ControlMode::PercentOutput , lPower);
-    this->pVictorSPX[1]->Set(ControlMode::PercentOutput, rPower);
+    //this->pVictorSPX[0]->Set(ControlMode::PercentOutput , lPower);
+    //this->pVictorSPX[1]->Set(ControlMode::PercentOutput, rPower);
 
 }
+
 
 
 
@@ -54,8 +56,37 @@ AdvancedDrive::AdvancedDrive(int talonCANID, int victorCANID) {
     this->pVictorSPX->Follow(*this->pTalonSRX);
 }
 
+void AdvancedDrive::InitSimpleRampedControl() {
+    this->pTalonSRX->ConfigVoltageCompSaturation(10, 10);
+    this->pVictorSPX->ConfigVoltageCompSaturation(10, 10);
+    this->pTalonSRX->SetNeutralMode(NeutralMode::Brake);
+    this->pVictorSPX->SetNeutralMode(NeutralMode::Brake);
+    //In (seconds), ramp output power
+    this->pTalonSRX->ConfigOpenloopRamp(0.5);
+}
+
+void AdvancedDrive::InitCurrentControl() {
+    this->pTalonSRX->ConfigVoltageCompSaturation(10, 10);
+    this->pVictorSPX->ConfigVoltageCompSaturation(10, 10);
+    
+    //Set PIDs
+    this->pTalonSRX->SelectProfileSlot(0, 0);
+    this->pTalonSRX->Config_kF(0, 1.0, 10); //LAST: 1.0     //WORKS: 1.0
+    this->pTalonSRX->Config_kP(0, 0.5, 10); //LAST: 0.1
+    this->pTalonSRX->Config_kI(0, 0.0, 10); //LAST: 0.0
+    this->pTalonSRX->Config_kD(0, 0.0, 10); //LAST: 0.0
+
+    this->pTalonSRX->SetNeutralMode(NeutralMode::Brake);
+    this->pVictorSPX->SetNeutralMode(NeutralMode::Brake);
+}
+
+
 void AdvancedDrive::SetPWM(double power) {
     this->pTalonSRX->Set(ControlMode::PercentOutput, power);
+}
+
+void AdvancedDrive::SetCurrent(double power) {
+    this->pTalonSRX->Set(ControlMode::Current, power);
 }
 
 void AdvancedDrive::InitVelocityControl() {

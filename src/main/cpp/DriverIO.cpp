@@ -25,3 +25,11 @@ double ControllerInput::getJoyY()
 {
     return this->m_pController->GetRawAxis(1);
 }
+
+void ControllerInput::setLeftRumble(double power) {
+    this->m_pController->SetRumble(frc::GenericHID::RumbleType::kLeftRumble, power);
+}
+
+void ControllerInput::setRightRumble(double power) {
+    this->m_pController->SetRumble(frc::GenericHID::RumbleType::kRightRumble, power);
+}

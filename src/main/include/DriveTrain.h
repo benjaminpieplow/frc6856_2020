@@ -4,6 +4,9 @@
 
 #include "ctre/Phoenix.h"
 
+/**
+ * TankDrive is largely depricated and no longer maintained in favour of AdvancedDrive, which has additional functionality
+ */
 class TankDrive {
 
     public:
@@ -24,10 +27,23 @@ class AdvancedDrive {
     public:
     AdvancedDrive(int talonCANID, int victorCANID);
     ~AdvancedDrive();
+    
+    //Set Talons to be basic (ramped) PWM controllers
+    void InitSimpleRampedControl();
 
+    //Sets Talons as current-sources
+    //DO NOT USE!
+    void InitCurrentControl();
+
+    //Set Talons to be fancy smart speed controllers
+    void InitVelocityControl();
+
+    //Simple, set output PWM (effectively voltage control)
     void SetPWM(double power);
 
-    void InitVelocityControl();
+    //Slightly less simple, lset output current
+    //DO NOT USE
+    void SetCurrent(double power);
 
     void SetTargetVelocity(double targetVel);
 
