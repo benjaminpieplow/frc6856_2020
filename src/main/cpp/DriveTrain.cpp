@@ -52,6 +52,7 @@ AdvancedDrive::AdvancedDrive(int talonCANID, int victorCANID) {
     this->pVictorSPX->ConfigFactoryDefault();
 
     this->pTalonSRX->ConfigVoltageCompSaturation(10,10);
+    this->pVictorSPX->ConfigVoltageCompSaturation(10,10);
 
     this->pVictorSPX->Follow(*this->pTalonSRX);
 }
@@ -89,6 +90,47 @@ void AdvancedDrive::SetCurrent(double power) {
     this->pTalonSRX->Set(ControlMode::Current, power);
 }
 
+void AdvancedDrive::VelocityTank(double joyX, double joyY) {
+    //Speed (in meters per second) drivers want as maximums
+    const double targetXVelocity = 1;
+    const double targetYVelocity = 3;
+
+    //Meters per Second at which the bot accelerates
+    const double rampAcceleration = 2;
+
+    
+    const double encoderPulsesPerRevolution = 1440; //360 * 4
+    //1 / ((Pi) * (Tire Diameter))
+    const double revolutionsPerMeter = 2.12;
+    //All Velocities seem to be 10 times too high, assuming 100ms sample rate for velocities
+    const double sampleRateMultiplier = 0.01;
+    double outputXVel = 0;
+
+    const double rampCorrectedAcceleration = rampAcceleration * sampleRateMultiplier;
+
+    //I'm pretty sure this sets the output in meters-per-second, no idea where the X10 comes from but it's needed
+    double inputXVel = targetXVelocity * joyX * revolutionsPerMeter * sampleRateMultiplier * 10;
+    double inputYVel = targetYVelocity * joyY * revolutionsPerMeter * sampleRateMultiplier * 10;
+
+    
+    double deltaYVel = inputYVel - this->currentYVel;
+    if ((deltaYVel) > rampCorrectedAcceleration) {
+        this->currentYVel += rampCorrectedAcceleration;
+    } else if (deltaYVel < -rampCorrectedAcceleration) {
+        this->currentYVel += -rampCorrectedAcceleration;
+    } else {
+        this->currentYVel = inputYVel;
+    }
+
+
+    if (this->mReverseYVel == true) {
+        this->pTalonSRX->Set(ControlMode::Velocity, (-this->currentYVel + inputXVel) * encoderPulsesPerRevolution);
+    } else {
+        this->pTalonSRX->Set(ControlMode::Velocity, (this->currentYVel + inputXVel) * encoderPulsesPerRevolution);
+    }
+    
+}
+
 void AdvancedDrive::InitVelocityControl() {
     this->pTalonSRX->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
     //this->pTalonSRX->ConfigSelectedFeedbackCoefficient();
@@ -105,17 +147,10 @@ void AdvancedDrive::InitVelocityControl() {
 
     //Set PIDs
     this->pTalonSRX->SelectProfileSlot(0, 0);
-    this->pTalonSRX->Config_kF(0, 0.3, 10);
-    this->pTalonSRX->Config_kP(0, 0.8, 10); //LAST: 0.4
+    this->pTalonSRX->Config_kF(0, 0.3, 10); //LAST: 0.3
+    this->pTalonSRX->Config_kP(0, 3.2, 10); //LAST: 1.6
     this->pTalonSRX->Config_kI(0, 0.0, 10); //LAST: 0.0
     this->pTalonSRX->Config_kD(0, 6.0, 10); //LAST: 0.0
-
-    //Set Accel and Cruise Velocity
-    this->pTalonSRX->ConfigMotionCruiseVelocity(1000, 10);
-    this->pTalonSRX->ConfigMotionAcceleration(800, 10);
-
-    this->pTalonSRX->ConfigVoltageCompSaturation(10, 10);
-    this->pVictorSPX->ConfigVoltageCompSaturation(10, 10);
 
     //Snappy Robit
     this->pTalonSRX->Set(NeutralMode::Brake);
@@ -128,4 +163,8 @@ void AdvancedDrive::SetTargetVelocity(double targetVel) {
 
 void AdvancedDrive::SetTargetMotionProfileTarget(double target) {
     this->pTalonSRX->Set(ControlMode::MotionMagic, target);
+}
+
+void AdvancedDrive::SetYVelocityInvert(bool invertState) {
+    this->mReverseYVel = invertState;
 }

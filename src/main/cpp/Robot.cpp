@@ -32,8 +32,14 @@ void Robot::RobotInit() {
 //  this->m_pLeftTrack->InitCurrentControl();
 //  this->m_pRightTrack->InitCurrentControl();
 
-  //this->m_pLeftTrack->InitVelocityControl();
-  //this->m_pRightTrack->InitVelocityControl();
+  //Init PIDs for Drivetrain
+  this->m_pLeftTrack->InitVelocityControl();
+  this->m_pRightTrack->InitVelocityControl();
+  this->m_pLeftTrack->VelocityTank(0,0);
+  this->m_pRightTrack->VelocityTank(0,0);
+
+  //Set left track to invert Y
+  this->m_pLeftTrack->SetYVelocityInvert(true);
 }
 
 /**
@@ -88,20 +94,25 @@ void Robot::TeleopPeriodic() {
    * m_pTankDrive.setTankDrivePower((0.75 * m_pPrimaryController->getJoyY()), (m_pPrimaryController->getJoyX() * 0.45));
    */
 
+  this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY());
+  this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY());
+
+
   //Drive Ratio
-  double lPower = 0.0;
-  double rPower = 0.0;
+//  double lPower = 0.0;
+//  double rPower = 0.0;
 
   //This ratio works for the drivers (NOTE: robot direction is inverted because it moves 'nicer' with the battery in the back)
-  double forwardSpeed = m_pPrimaryController->getJoyY() * 0.75 * -1;
-  double turnSpeed = m_pPrimaryController->getJoyX() * 0.35;
+//  double forwardSpeed = m_pPrimaryController->getJoyY() * 0.75;
+//  double turnSpeed = m_pPrimaryController->getJoyX() * 0.35;
 
   //Basic tank-drive algorithm
-  rPower = (forwardSpeed + turnSpeed);
-  lPower = (-forwardSpeed + turnSpeed);
+//  rPower = (forwardSpeed + turnSpeed);
+//  lPower = (-forwardSpeed + turnSpeed);
 
-  this->m_pLeftTrack->SetPWM(lPower);
-  this->m_pRightTrack->SetPWM(rPower);
+  //Good old fasioned Tank Drive
+//  this->m_pLeftTrack->SetPWM(lPower);
+//  this->m_pRightTrack->SetPWM(rPower);
 
   //Experiment with Rumble
 //  if (m_pPrimaryController->getJoyX() > 0) {
@@ -116,8 +127,8 @@ void Robot::TeleopPeriodic() {
 //  this->m_pRightTrack->SetCurrent(rPower);
 
   //Currently, this uses only kF (feed forward gain) to apply power on the left track, since the encoder is broken
-//  this->m_pRightTrack->SetTargetVelocity(rPower * 4096);
-//  this->m_pLeftTrack->SetTargetVelocity(lPower * 4096);
+//  this->m_pRightTrack->SetTargetVelocity(rPower * 1024);
+//  this->m_pLeftTrack->SetTargetVelocity(lPower * 1024);
 
   //If testing encoders, use motion profiles to servo to position
 //  this->m_pRightTrack->SetTargetMotionProfileTarget(rPower * 4096 * 5);

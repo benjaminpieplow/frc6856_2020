@@ -38,6 +38,8 @@ class AdvancedDrive {
     //Set Talons to be fancy smart speed controllers
     void InitVelocityControl();
 
+    void SetYVelocityInvert(bool invertState);
+
     //Simple, set output PWM (effectively voltage control)
     void SetPWM(double power);
 
@@ -45,11 +47,21 @@ class AdvancedDrive {
     //DO NOT USE
     void SetCurrent(double power);
 
+    //Sets the desired velocity on the Talon (no ramping)
     void SetTargetVelocity(double targetVel);
+
+    //Acceleration-Corrected, Velocity-Matching, Ramping tank drive
+    void VelocityTank(double joyX, double joyY);
 
     void SetTargetMotionProfileTarget(double target);
 
     private:
     WPI_TalonSRX* pTalonSRX;
     WPI_VictorSPX* pVictorSPX;
+
+    //If true, inverts Y velocity (Set on LEFT tank track)
+    bool mReverseYVel = false;
+
+    double currentXVel = 0;
+    double currentYVel = 0;
 };
