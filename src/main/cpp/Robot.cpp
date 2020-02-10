@@ -11,6 +11,7 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
+
 void Robot::RobotInit() {
   m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
   m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
@@ -120,15 +121,21 @@ void Robot::TeleopPeriodic() {
 //  } else if (m_pPrimaryController->getJoyX() < 0) {
 //    m_pPrimaryController->setLeftRumble(m_pPrimaryController->getJoyX() * -1);
 //  }
-  
-  //Set Current Output
-  //DO NOT USE
-//  this->m_pLeftTrack->SetCurrent(lPower);
-//  this->m_pRightTrack->SetCurrent(rPower);
 
-  //Currently, this uses only kF (feed forward gain) to apply power on the left track, since the encoder is broken
-//  this->m_pRightTrack->SetTargetVelocity(rPower * 1024);
-//  this->m_pLeftTrack->SetTargetVelocity(lPower * 1024);
+  //Begin Crude Vision Playground
+  //frc::SmartDashboard::PutNumber("DB/String 0",  visionTable->GetNumber("visionTargetXPos", -1) );
+  //frc::SmartDashboard::PutString("DB/String 0", visionTable->GetString("visionTargetXPos", "-1"));
+  double sliderPos = -1;
+  double visionTargetXPos = frc::SmartDashboard::GetNumber("visionTargetXPos", -1);
+  if (visionTargetXPos == -1) {
+    sliderPos = -1;
+  } else 
+  {
+    sliderPos = (visionTargetXPos - 320) / 128;
+  }
+  
+  
+  frc::SmartDashboard::PutNumber("DB/Slider 0", sliderPos);
 
   //If testing encoders, use motion profiles to servo to position
 //  this->m_pRightTrack->SetTargetMotionProfileTarget(rPower * 4096 * 5);

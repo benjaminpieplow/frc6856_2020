@@ -16,6 +16,10 @@
 
 #include <DriverIO.h>
 
+//Maybe we can move this somewhere else?
+#include <ntcore.h>
+#include <networktables/NetworkTable.h>
+
 class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override;
@@ -38,4 +42,6 @@ class Robot : public frc::TimedRobot {
 
   AdvancedDrive* m_pLeftTrack;
   AdvancedDrive* m_pRightTrack;
+
+  NetworkTable* visionTable;
 };
