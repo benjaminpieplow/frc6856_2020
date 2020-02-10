@@ -95,7 +95,7 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY) {
     const double targetXVelocity = 1;
     const double targetYVelocity = 3;
 
-    //Meters per Second at which the bot accelerates
+    //Meters per Second ^2 at which the bot accelerates
     const double rampAcceleration = 2;
 
     
@@ -109,6 +109,7 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY) {
     const double rampCorrectedAcceleration = rampAcceleration * sampleRateMultiplier;
 
     //I'm pretty sure this sets the output in meters-per-second, no idea where the X10 comes from but it's needed
+    //TODO: Best guess is that the X10 comes from the talon sampling at 1ms intervals, investigate that
     double inputXVel = targetXVelocity * joyX * revolutionsPerMeter * sampleRateMultiplier * 10;
     double inputYVel = targetYVelocity * joyY * revolutionsPerMeter * sampleRateMultiplier * 10;
 
