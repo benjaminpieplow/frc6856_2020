@@ -26,6 +26,9 @@ double ControllerInput::getJoyY()
     return this->m_pController->GetRawAxis(1);
 }
 
+/**
+ * Experimental: Use left/right rumble feedback to interact with drivers
+ */
 void ControllerInput::setLeftRumble(double power) {
     this->m_pController->SetRumble(frc::GenericHID::RumbleType::kLeftRumble, power);
 }

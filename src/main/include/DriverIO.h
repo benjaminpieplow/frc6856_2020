@@ -4,6 +4,9 @@
 //#include <frc/WPILib.h>
 //#include <cstdlib>
 
+/**
+ * A basic xBox controller and calls to get data from it
+ */
 class ControllerInput
 {
     public:

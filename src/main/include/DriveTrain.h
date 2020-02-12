@@ -22,7 +22,11 @@ class TankDrive {
 };
 
 
-
+/**
+ * Contains every iteration of the AdvancedDrive class
+ * Able to run PWM, Velocity and Ramped Velocity drivetrain control
+ * Also used for development of position, current and other "smart" drive modes
+ */
 class AdvancedDrive {
     public:
     AdvancedDrive(int talonCANID, int victorCANID);
@@ -51,8 +55,10 @@ class AdvancedDrive {
     void SetTargetVelocity(double targetVel);
 
     //Acceleration-Corrected, Velocity-Matching, Ramping tank drive
+    //Joystick inputs are a factor of target velocity currently set in DriveTrain.cpp
     void VelocityTank(double joyX, double joyY);
 
+    //Used to troubleshoot encoders and demonstrate servos
     void SetTargetMotionProfileTarget(double target);
 
     private:
@@ -62,6 +68,7 @@ class AdvancedDrive {
     //If true, inverts Y velocity (Set on LEFT tank track)
     bool mReverseYVel = false;
 
+    //Used for velocitytank ramping
     double currentXVel = 0;
     double currentYVel = 0;
 };

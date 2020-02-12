@@ -4,6 +4,10 @@
 
 #include <DriveTrain.h>
 
+/**
+ * Initiates a simple TankDrive
+ * Contains both 'tracks' in the same object
+ */
 TankDrive::TankDrive()
 {   
     //Create an array of TalonSRX objects for drive wheels, these will be addressed by the motors
@@ -25,8 +29,12 @@ TankDrive::TankDrive()
 
 TankDrive::~TankDrive()
 {
+    //You want a destructor? Reboot the robot
 }
 
+/**
+ * Sets Talons and Victors to required speed inputting joystick positions -1 through 1
+ */
 void TankDrive::setTankDrivePower(double forwardSpeed, double turnSpeed)
 {
     double lPower = 0.0;
@@ -43,7 +51,10 @@ void TankDrive::setTankDrivePower(double forwardSpeed, double turnSpeed)
 
 
 
-
+/**
+ * A more complex tank drive system, this only does one track
+ * Inputs CANIDs to bind motors
+ */
 AdvancedDrive::AdvancedDrive(int talonCANID, int victorCANID) {
     this->pTalonSRX = new WPI_TalonSRX(talonCANID);
     this->pVictorSPX = new WPI_VictorSPX(victorCANID);
@@ -57,6 +68,12 @@ AdvancedDrive::AdvancedDrive(int talonCANID, int victorCANID) {
     this->pVictorSPX->Follow(*this->pTalonSRX);
 }
 
+/**
+ * Initiates simple ramped robot control
+ * Performs simple VOLTAGE ramping
+ * Handles like a beached barge
+ * Pairs with SetPWM
+ */
 void AdvancedDrive::InitSimpleRampedControl() {
     this->pTalonSRX->ConfigVoltageCompSaturation(10, 10);
     this->pVictorSPX->ConfigVoltageCompSaturation(10, 10);
@@ -66,6 +83,10 @@ void AdvancedDrive::InitSimpleRampedControl() {
     this->pTalonSRX->ConfigOpenloopRamp(0.5);
 }
 
+/**
+ * Mainly used to test torque control
+ * Actually just pisses off the robot
+ */
 void AdvancedDrive::InitCurrentControl() {
     this->pTalonSRX->ConfigVoltageCompSaturation(10, 10);
     this->pVictorSPX->ConfigVoltageCompSaturation(10, 10);
@@ -81,15 +102,29 @@ void AdvancedDrive::InitCurrentControl() {
     this->pVictorSPX->SetNeutralMode(NeutralMode::Brake);
 }
 
-
+/**
+ * For when people are yelling at you that code is the problem
+ * Sets the track to a PWM output
+ * VoltageRamp overrides this
+ * Handles like a drunk dolphin without voltageramp
+ */
 void AdvancedDrive::SetPWM(double power) {
     this->pTalonSRX->Set(ControlMode::PercentOutput, power);
 }
 
+/**
+ * Does not work, angers the robot, do not use
+ */
 void AdvancedDrive::SetCurrent(double power) {
     this->pTalonSRX->Set(ControlMode::Current, power);
 }
 
+/**
+ * Lets us say, "That's not a drivetrain, THIS is a drivetrain"
+ * Uses velocity control with linear ramping
+ * Corrects all units to SI units
+ * Handles like a Falcon hunting
+ */
 void AdvancedDrive::VelocityTank(double joyX, double joyY) {
     //Speed (in meters per second) drivers want as maximums
     const double targetXVelocity = 1;
@@ -98,7 +133,7 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY) {
     //Meters per Second ^2 at which the bot accelerates
     const double rampAcceleration = 2;
 
-    
+    //Ratio between encoder ticks and two radians (TODO: SI units)
     const double encoderPulsesPerRevolution = 1440; //360 * 4
     //1 / ((Pi) * (Tire Diameter))
     const double revolutionsPerMeter = 2.12;
@@ -113,7 +148,8 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY) {
     double inputXVel = targetXVelocity * joyX * revolutionsPerMeter * sampleRateMultiplier * 10;
     double inputYVel = targetYVelocity * joyY * revolutionsPerMeter * sampleRateMultiplier * 10;
 
-    
+    //Simple, linear ramp
+    //TODO: Rapid-Decay ramp, "brake" mode
     double deltaYVel = inputYVel - this->currentYVel;
     if ((deltaYVel) > rampCorrectedAcceleration) {
         this->currentYVel += rampCorrectedAcceleration;
@@ -123,7 +159,7 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY) {
         this->currentYVel = inputYVel;
     }
 
-
+    //Allows same code to be used on either side of the robot
     if (this->mReverseYVel == true) {
         this->pTalonSRX->Set(ControlMode::Velocity, (-this->currentYVel + inputXVel) * encoderPulsesPerRevolution);
     } else {
@@ -132,6 +168,9 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY) {
     
 }
 
+/**
+ * Makes the fancy velocity control work (also needed for motionmagic)
+ */
 void AdvancedDrive::InitVelocityControl() {
     this->pTalonSRX->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
     //this->pTalonSRX->ConfigSelectedFeedbackCoefficient();
@@ -158,14 +197,27 @@ void AdvancedDrive::InitVelocityControl() {
     //this->pVictorSPX->Set(NeutralMode::Brake);
 }
 
+/**
+ * Almost a backend call, sets a target velocity for the track to hold
+ * Will work when mapped to a joystick (note: accepted unit is ticks-per-second) but
+ * If not ramped, leads to a VIOLENT robot
+ * Handles like a jumpy raccoon
+ */
 void AdvancedDrive::SetTargetVelocity(double targetVel) {
     this->pTalonSRX->Set(ControlMode::Velocity, targetVel);
 }
 
+/**
+ * Sets a target (in ticks) for MotionMagic to servo to
+ * Handles like a Greyhound chained to a pole
+ */
 void AdvancedDrive::SetTargetMotionProfileTarget(double target) {
     this->pTalonSRX->Set(ControlMode::MotionMagic, target);
 }
 
+/**
+ * Run at init on the left track (or right, depending on how the robot is built)
+ */
 void AdvancedDrive::SetYVelocityInvert(bool invertState) {
     this->mReverseYVel = invertState;
 }
