@@ -10,10 +10,10 @@ class Turret {
     Turret(int CANID);
     ~Turret();
 
+    void SetTurretTarget(double position);
+
     private:
     //Motor that rotates the turret
     WPI_TalonSRX* m_pTurretServo;
-
-    
 
 };
