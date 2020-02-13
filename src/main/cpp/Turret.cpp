@@ -29,3 +29,32 @@ Turret::Turret(int CANID) {
     this->m_pTurretServo->ConfigMotionCruiseVelocity(100, 10);
     this->m_pTurretServo->ConfigMotionAcceleration(100, 0);
 }
+
+//Returns the angle of the target relative to the turret in degrees
+double Turret::GetFOVTargetXAngle() {
+    this->pCameraTargetFOVXAngle = this->pCameraXFOV * this->pCameraTargetFOVXAngle;
+    return this->pCameraTargetFOVXAngle;
+}
+//Converts from FOVTargetFactor to FOVTargetAngle
+double Turret::GetFOVTargetAngle(double FOVTargetFactor) {
+    this->pCameraTargetFOVXAngle = this->pCameraXFOV * FOVTargetFactor;
+    return this->pCameraTargetFOVXAngle;
+}
+
+//Returns the angle of the target relative to the turret as a factor of the camera's FOV (-1 to +1)
+double Turret::GetFOVTargetFactor() {
+    this->pCameraTargetFOVXFactor = this->pCameraFOVResRatio * this->pCameraTargetHPos;
+    return this->pCameraTargetFOVXFactor;
+}
+//Converts from hPos to FOVTargetFactor
+double Turret::GetFOVTargetFactor(double hPos) {
+    this->pCameraTargetFOVXFactor = this->pCameraFOVResRatio * hPos;
+    return this->pCameraTargetFOVXFactor;
+}
+
+//Returns the angle of the target relative to the frame
+double Turret::GetFrameTargetAngle() {
+    /**
+     * TODO:
+     */
+}
