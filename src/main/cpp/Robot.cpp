@@ -83,6 +83,8 @@ void Robot::AutonomousPeriodic() {
   } else {
     // Default Auto goes here
   }
+
+  
 }
 
 void Robot::TeleopInit() {}
@@ -143,7 +145,23 @@ void Robot::TeleopPeriodic() {
 
 }
 
-void Robot::TestPeriodic() {}
+void Robot::TestPeriodic() {
+
+  double sliderPos = -1;
+  double visionTargetXPos = frc::SmartDashboard::GetNumber("visionTargetXPos", -1);
+  double visionTargetXRatio = visionTargetXPos / (320) - 1;
+  if (visionTargetXPos == -1) {
+    sliderPos = -1;
+  } else 
+  {
+    sliderPos = (visionTargetXPos - 320) / 128;
+  }
+
+  frc::SmartDashboard::PutNumber("DB/Slider 0", visionTargetXRatio);
+
+  this->m_pLeftTrack->VelocityTank(visionTargetXRatio * 0.8, 0);
+  this->m_pRightTrack->VelocityTank(visionTargetXRatio * 0.8, 0);
+}
 
 #ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
