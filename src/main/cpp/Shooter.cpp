@@ -3,7 +3,7 @@
 
 Shooter::Shooter(int CANID) {
 
-    m_pShooterMotor = new WPI_TalonSRX(CANID);
+    this->m_pShooterMotor = new WPI_TalonSRX(CANID);
 
     this->m_pShooterMotor->ConfigFactoryDefault();
 
@@ -57,6 +57,7 @@ void Shooter::SetTargetVelocity(double targetRPM) {
 }
 
 void Shooter::SetTargetVelocity() {
+    //This will probably have to be / 600, usnure what the Falcon's velocity unit is
     double targetVelocity = (this->mShooterTargetRPM * this->encoderUnitsPerRevolution) / 60;
     this->m_pShooterMotor->Set(ControlMode::Velocity, targetVelocity);
 }
