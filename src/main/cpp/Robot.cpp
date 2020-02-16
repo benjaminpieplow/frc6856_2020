@@ -136,7 +136,12 @@ void Robot::TeleopPeriodic() {
 
 }
 
-void Robot::TestPeriodic() {}
+void Robot::TestPeriodic() {
+  //So simple, test BOOST
+  this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
+  this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
+  
+}
 
 #ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
