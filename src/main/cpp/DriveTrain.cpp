@@ -77,6 +77,7 @@ void AdvancedDrive::InitCurrentControl() {
     this->pTalonSRX->Config_kI(0, 0.0, 10); //LAST: 0.0
     this->pTalonSRX->Config_kD(0, 0.0, 10); //LAST: 0.0
 
+    //Investigate if this is causing issuese with max power
     this->pTalonSRX->SetNeutralMode(NeutralMode::Brake);
     this->pVictorSPX->SetNeutralMode(NeutralMode::Brake);
 }
@@ -136,10 +137,13 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY) {
  * Same as above, but uses a trigger for extra BOOST
  */
 void AdvancedDrive::VelocityTank(double joyX, double joyY, double joyBoost) {
+    //If power is under 5%, zero stick inputs
+    //Done to prevent integral windup
     if (!(-0.05 > joyX || joyX > 0.05 || -0.05 > joyY || joyY > 0.05)) {
         joyX = 0;
         joyY = 0;
     }
+
     //Speed (in meters per second) drivers want as maximums
     const double targetXVelocity = 1;
     const double targetYVelocity = 2;
@@ -149,21 +153,24 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY, double joyBoost) {
     //Meters per Second at which the bot accelerates
     const double rampAcceleration = 2;
 
-    
+    //Number of encoder units per rotation of the output shaft
     const double encoderPulsesPerRevolution = 1440; //360 * 4
     //1 / ((Pi) * (Tire Diameter))
     const double revolutionsPerMeter = 2.12;
     //All Velocities seem to be 10 times too high, assuming 100ms sample rate for velocities
     const double sampleRateMultiplier = 0.01;
-    double outputXVel = 0;
-
     const double rampCorrectedAcceleration = rampAcceleration * sampleRateMultiplier;
+
+    //Encoder units per second sent to Talon
+    double outputXVel = 0;
 
     //I'm pretty sure this sets the output in meters-per-second, no idea where the X10 comes from but it's needed
     double inputXVel = targetXVelocity * joyX * revolutionsPerMeter * sampleRateMultiplier * 10 - joyBoost * targetXVelocity * joyX * revolutionsPerMeter * sampleRateMultiplier * boostSteerReductionFactor * 10;
     double inputYVel = targetYVelocity * joyY * revolutionsPerMeter * sampleRateMultiplier * 10 + targetBoostVelocity * joyY * joyBoost * revolutionsPerMeter * sampleRateMultiplier * 10;
 
-    
+    //Ramp
+    //TODO: Rapid Decay (or maybe not, this robit stops pretty quickly)
+
     double deltaYVel = inputYVel - this->currentYVel;
     if ((deltaYVel) > rampCorrectedAcceleration) {
         this->currentYVel += rampCorrectedAcceleration;
