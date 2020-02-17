@@ -3,17 +3,14 @@
 
 Shooter::Shooter(int CANID) {
 
-    m_pShooterMotor = new WPI_TalonSRX(CANID);
+    m_pShooterMotor = new WPI_TalonFX(CANID);
 
     this->m_pShooterMotor->ConfigFactoryDefault();
 
     this->m_pShooterMotor->ConfigVoltageCompSaturation(10,10);
+    this->m_pShooterMotor->EnableVoltageCompensation(true);
 
-    this->m_pShooterMotor->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
-    this->m_pShooterMotor->SetSensorPhase(false);
-    this->m_pShooterMotor->SetInverted(false);
-    this->m_pShooterMotor->SetStatusFramePeriod(StatusFrameEnhanced::Status_13_Base_PIDF0, 10, 10);
-    this->m_pShooterMotor->SetStatusFramePeriod(StatusFrameEnhanced::Status_10_MotionMagic, 10, 10);
+    this->m_pShooterMotor->SetInverted(true);
 
     //Set Maximums and Targets
     this->m_pShooterMotor->ConfigNominalOutputForward(0, 10);
@@ -33,30 +30,51 @@ Shooter::Shooter(int CANID) {
      */
     this->m_pShooterMotor->SelectProfileSlot(0, 0);
     this->m_pShooterMotor->Config_kF(0, 0.3, 10);
-    this->m_pShooterMotor->Config_kP(0, 0.1, 10); //LAST: 0.1
-    this->m_pShooterMotor->Config_kI(0, 0.0, 10); //LAST: 0.0
-    this->m_pShooterMotor->Config_kD(0, 0.0, 10); //LAST: 0.0
+    this->m_pShooterMotor->Config_kP(0, 0.01, 10); //LAST: 0.04
+    this->m_pShooterMotor->Config_kI(0, 0.0005, 10); //LAST: 0.0
+    this->m_pShooterMotor->Config_kD(0, 0.6, 10); //LAST: 0.0
 
-    //Set Accel and Cruise Velocity
-    //Used for Motion Magic, is worth investigating if slamming to RPM angers the integral accumulator, will disable for now
-    //this->m_pShooterMotor->ConfigMotionCruiseVelocity(500, 10);
-    //this->m_pShooterMotor->ConfigMotionAcceleration(1500, 10);
+    this->m_pShooterMotor->Config_IntegralZone(0, 500, 10);
 
-    //Get that little bit of juice back
-    this->m_pShooterMotor->Set(NeutralMode::Brake);
+    this->m_pShooterMotor->ConfigClosedloopRamp(0.10);
+}
 
+
+
+void Shooter::EnableShooter(double targetRPM) {
+    this->mShooterTargetRPM = targetRPM;
+    this->EnableShooter();
 }
 
 void Shooter::EnableShooter() {
-    this->mShooterEnabled = true;
-}
-
-void Shooter::SetTargetVelocity(double targetRPM) {
-    this->mShooterTargetRPM = targetRPM;
-    this->SetTargetVelocity();
-}
-
-void Shooter::SetTargetVelocity() {
-    double targetVelocity = (this->mShooterTargetRPM * this->encoderUnitsPerRevolution) / 60;
+    double targetVelocity = (this->mShooterTargetRPM * this->encoderUnitsPerRevolution) / 600;
     this->m_pShooterMotor->Set(ControlMode::Velocity, targetVelocity);
+}
+
+void Shooter::DisableShooter() {
+    this->m_pShooterMotor->Set(ControlMode::PercentOutput, 0);
+    //Hopefully one day
+//    this->m_pShooterMotor->SetNeutralMode(Brake);
+}
+
+void Shooter::ShooterPower(double power) {
+    this->m_pShooterMotor->Set(ControlMode::PercentOutput, power);
+}
+
+
+//Is the shooter ready?
+bool Shooter::ShooterReady() {
+    return (!(this->ShooterUnderspeed() || this->ShooterOverspeed()));
+}
+//Is the shooter underspeed?
+bool Shooter::ShooterUnderspeed() {
+    //Convert from Encoder Ticks per 100ms to RPM
+    double measuredRPM = (this->m_pShooterMotor->GetSelectedSensorVelocity(0) * 600) / this->encoderUnitsPerRevolution;
+    return (measuredRPM <= (1 - this->mAllowedErrorMargin) * this->mShooterTargetRPM);
+}
+//Is the shooter overspeed?
+bool Shooter::ShooterOverspeed() {
+    //Convert from Encoder Ticks per 100ms to RPM
+    double measuredRPM = (this->m_pShooterMotor->GetSelectedSensorVelocity(0) * 600) / this->encoderUnitsPerRevolution;
+    return (measuredRPM >= (1 + this->mAllowedErrorMargin) * this->mShooterTargetRPM);
 }

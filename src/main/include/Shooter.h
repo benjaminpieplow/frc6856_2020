@@ -13,33 +13,37 @@ class Shooter {
     ~Shooter();
 
     //How many encoder ticks map to one revolution of the accelerator shaft
-    const int encoderUnitsPerRevolution = 1000;
+    const int encoderUnitsPerRevolution = 2048;
 
     //Initiates the turret firing system using the last set RPM
     void EnableShooter();
+    void EnableShooter(double targetRPM);
 
-    bool IsTurretReady();
+    //Kills the shooter
+    void DisableShooter();
 
-    //Update Target RPM and send to Talon
-    void SetTargetVelocity(double targetRPM);
+    //For testing and Development
+    void ShooterPower(double power);
 
-    //Remind Talon what the target RPM is
-    void SetTargetVelocity();
+
+    //Is the shooter ready?
+    bool ShooterReady();
+    //Is the shooter underspeed?
+    bool ShooterUnderspeed();
+    //Is the shooter overspeed?
+    bool ShooterOverspeed();
 
 
     private:
-    //Is the mechanism enabled?
-    bool mShooterEnabled = false;
-    //Is the shooter ready?
-    bool mShooterReady = false;
-    //Is the shooter underspeed?
-    bool mShooterUnderspeed = false;
-    //Is the shooter overspeed?
-    bool mShooterOverspeed = false;
-
     //Target RPM
-    double mShooterTargetRPM = 3000;
+    double mShooterTargetRPM = 500;
+
+    //Sample Rate Multiplier
+    const double mSampleRateModifier = 10;
+
+    //Allowed Error when checking speed (Percent)
+    const double mAllowedErrorMargin = 0.1;
     
     //Shooter Motor
-    WPI_TalonSRX* m_pShooterMotor;
+    WPI_TalonFX* m_pShooterMotor;
 };

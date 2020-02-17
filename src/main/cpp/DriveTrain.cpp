@@ -149,13 +149,13 @@ void AdvancedDrive::InitVelocityControl() {
     //Set PIDs
     this->pTalonSRX->SelectProfileSlot(0, 0);
     this->pTalonSRX->Config_kF(0, 0.3, 10); //LAST: 0.3
-    this->pTalonSRX->Config_kP(0, 3.2, 10); //LAST: 1.6
+    this->pTalonSRX->Config_kP(0, 0.0, 10); //LAST: 1.6
     this->pTalonSRX->Config_kI(0, 0.0, 10); //LAST: 0.0
     this->pTalonSRX->Config_kD(0, 6.0, 10); //LAST: 0.0
 
     //Snappy Robit
-    this->pTalonSRX->Set(NeutralMode::Brake);
-    //this->pVictorSPX->Set(NeutralMode::Brake);
+//    this->pTalonSRX->Set(NeutralMode::Brake);
+//    this->pVictorSPX->Set(NeutralMode::Brake);
 }
 
 void AdvancedDrive::SetTargetVelocity(double targetVel) {

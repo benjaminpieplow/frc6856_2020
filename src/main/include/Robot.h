@@ -16,6 +16,8 @@
 
 #include <DriverIO.h>
 
+#include <Shooter.h>
+
 //Maybe we can move this somewhere else?
 #include <ntcore.h>
 #include <networktables/NetworkTable.h>
@@ -44,4 +46,6 @@ class Robot : public frc::TimedRobot {
   AdvancedDrive* m_pRightTrack;
 
   NetworkTable* visionTable;
+
+  Shooter* m_pTestShooter;
 };
