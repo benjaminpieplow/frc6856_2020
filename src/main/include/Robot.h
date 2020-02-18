@@ -17,6 +17,7 @@
 #include <DriverIO.h>
 
 #include <Shooter.h>
+#include <Turret.h>
 
 //Maybe we can move this somewhere else?
 #include <ntcore.h>
@@ -48,4 +49,6 @@ class Robot : public frc::TimedRobot {
   NetworkTable* visionTable;
 
   Shooter* m_pTestShooter;
+
+  Turret* m_pTestTurret;
 };

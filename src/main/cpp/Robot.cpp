@@ -27,6 +27,9 @@ void Robot::RobotInit() {
   //Shooter Falcon
   this->m_pTestShooter = new Shooter(40);
 
+  //Turret System
+  this->m_pTestTurret = new Turret(16);
+
   //Enable ramped power control
 //  this->m_pLeftTrack->InitSimpleRampedControl();
 //  this->m_pRightTrack->InitSimpleRampedControl();
@@ -158,8 +161,13 @@ void Robot::TeleopPeriodic() {
 }
 
 void Robot::TestPeriodic() {
-//  this->m_pTestShooter->ShooterPower(0.36);
-  this->m_pTestShooter->EnableShooter();
+  double currentRPM = m_pTestShooter->GetShooterRPM();
+  double newRPM = currentRPM + 10 * this->m_pPrimaryController->getJoyY();
+  this->m_pTestShooter->EnableShooter(newRPM);
+  frc::SmartDashboard::PutNumber("DB/Slider 0", newRPM / 1000);
+//  this->m_pTestShooter->EnableShooter();
+
+this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX());
 }
 
 #ifndef RUNNING_FRC_TESTS

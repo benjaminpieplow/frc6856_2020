@@ -5,6 +5,8 @@ Shooter::Shooter(int CANID) {
 
     m_pShooterMotor = new WPI_TalonFX(CANID);
 
+    m_pRangerSerial = new frc::SerialPort(9600, frc::SerialPort::kOnboard, 8, frc::SerialPort::Parity::kParity_None, frc::SerialPort::StopBits::kStopBits_One);
+
     this->m_pShooterMotor->ConfigFactoryDefault();
 
     this->m_pShooterMotor->ConfigVoltageCompSaturation(10,10);
@@ -51,6 +53,11 @@ void Shooter::EnableShooter() {
     this->m_pShooterMotor->Set(ControlMode::Velocity, targetVelocity);
 }
 
+void Shooter::EnableAutoShooter() {
+    double targetVelocity = 0;
+    this->m_pShooterMotor->Set(ControlMode::Velocity, targetVelocity);
+}
+
 void Shooter::DisableShooter() {
     this->m_pShooterMotor->Set(ControlMode::PercentOutput, 0);
     //Hopefully one day
@@ -59,6 +66,10 @@ void Shooter::DisableShooter() {
 
 void Shooter::ShooterPower(double power) {
     this->m_pShooterMotor->Set(ControlMode::PercentOutput, power);
+}
+
+double Shooter::GetShooterRPM() {
+    return this->mShooterTargetRPM;
 }
 
 

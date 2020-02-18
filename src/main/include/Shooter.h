@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ctre/Phoenix.h"
+#include <frc/SerialPort.h>
 
 class Shooter {
     public:
@@ -18,12 +19,16 @@ class Shooter {
     //Initiates the turret firing system using the last set RPM
     void EnableShooter();
     void EnableShooter(double targetRPM);
+    void EnableAutoShooter();
 
     //Kills the shooter
     void DisableShooter();
 
     //For testing and Development
     void ShooterPower(double power);
+
+    //Returns the current target RPM
+    double GetShooterRPM();
 
 
     //Is the shooter ready?
@@ -43,7 +48,21 @@ class Shooter {
 
     //Allowed Error when checking speed (Percent)
     const double mAllowedErrorMargin = 0.1;
+
+    //AutoShooter Point-Blank RPM target
+    const double mAutoShooterBaselineRPM = 500;
+    //AutoShooter Meters per Volt
+    const double mAutoShooterMetersPerMiliVolt = 0.1;
+    //AutoShooter RPM per meter
+    //TODO: Tune
+    const double mAutoShooterRPMPerMeter = 100;
+
+
     
     //Shooter Motor
     WPI_TalonFX* m_pShooterMotor;
+
+    //Ultrasonic Sensor
+    frc::SerialPort* m_pRangerSerial;
+
 };

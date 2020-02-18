@@ -30,6 +30,10 @@ Turret::Turret(int CANID) {
     this->m_pTurretServo->ConfigMotionAcceleration(100, 0);
 }
 
+void Turret::SetTurretPower(double power) {
+    this->m_pTurretServo->Set(ControlMode::PercentOutput, power);
+}
+
 //Returns the angle of the target relative to the turret in degrees
 double Turret::GetFOVTargetXAngle() {
     this->pCameraTargetFOVXAngle = this->pCameraXFOV * this->pCameraTargetFOVXAngle;

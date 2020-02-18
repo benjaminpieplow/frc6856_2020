@@ -10,6 +10,8 @@ class Turret {
     Turret(int CANID);
     ~Turret();
 
+    void SetTurretPower(double power);
+
     //Returns true when turret is aimed at target
     bool GetLockState();
 
