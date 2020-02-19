@@ -162,12 +162,24 @@ void Robot::TeleopPeriodic() {
 
 void Robot::TestPeriodic() {
   double currentRPM = m_pTestShooter->GetShooterRPM();
-  double newRPM = currentRPM + 10 * this->m_pPrimaryController->getJoyY();
-  this->m_pTestShooter->EnableShooter(newRPM);
+  double newRPM = currentRPM + 10 * this->m_pPrimaryController->getJoyY() * -1;
+//  this->m_pTestShooter->EnableShooter(newRPM);
   frc::SmartDashboard::PutNumber("DB/Slider 0", newRPM / 1000);
 //  this->m_pTestShooter->EnableShooter();
 
-this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX());
+  double visionTargetXPos = frc::SmartDashboard::GetNumber("visionTargetXPos", -1);
+  double visionTargetXRatio = visionTargetXPos / (320) - 1;
+  frc::SmartDashboard::PutNumber("DB/Slider 1", visionTargetXRatio);
+
+  if (visionTargetXPos < 0) {
+    this->m_pTestTurret->SetTurretPower(0);
+  } else
+  {
+    this->m_pTestTurret->SetTurretPower(visionTargetXRatio * -0.50);
+  }
+  
+
+
 }
 
 #ifndef RUNNING_FRC_TESTS
