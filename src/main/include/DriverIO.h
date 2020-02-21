@@ -16,6 +16,9 @@ class ControllerInput
     //Returns Joystick Y Axis
     double getJoyY();
 
+    //Returns right trigger
+    double getRTrigger();
+
     //Sets Left Rumble
     void setLeftRumble(double power);
 

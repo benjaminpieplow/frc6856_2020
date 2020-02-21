@@ -95,55 +95,27 @@ void Robot::TeleopPeriodic() {
    * m_pTankDrive.setTankDrivePower((0.75 * m_pPrimaryController->getJoyY()), (m_pPrimaryController->getJoyX() * 0.45));
    */
 
-  this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY());
-  this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY());
+
+  /**
+   * VelocityTank will hold the wheels at a velocity, set in meters per second
+   * Boost will increase this speed, but reduce steering
+   * Currently, either the integral accumulator or (more likely) a combination of Boost and maximum velocity not being reached
+   * prevents the robot from decelerating on demand. Fix this when you have a working drive base.
+   */
+  this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
+  this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
 
 
-  //Drive Ratio
-//  double lPower = 0.0;
-//  double rPower = 0.0;
 
-  //This ratio works for the drivers (NOTE: robot direction is inverted because it moves 'nicer' with the battery in the back)
-//  double forwardSpeed = m_pPrimaryController->getJoyY() * 0.75;
-//  double turnSpeed = m_pPrimaryController->getJoyX() * 0.35;
+}
 
-  //Basic tank-drive algorithm
-//  rPower = (forwardSpeed + turnSpeed);
-//  lPower = (-forwardSpeed + turnSpeed);
-
-  //Good old fasioned Tank Drive
-//  this->m_pLeftTrack->SetPWM(lPower);
-//  this->m_pRightTrack->SetPWM(rPower);
-
-  //Experiment with Rumble
-//  if (m_pPrimaryController->getJoyX() > 0) {
-//    this->m_pPrimaryController->setRightRumble(m_pPrimaryController->getJoyX());
-//  } else if (m_pPrimaryController->getJoyX() < 0) {
-//    m_pPrimaryController->setLeftRumble(m_pPrimaryController->getJoyX() * -1);
-//  }
-
-  //Begin Crude Vision Playground
-  //frc::SmartDashboard::PutNumber("DB/String 0",  visionTable->GetNumber("visionTargetXPos", -1) );
-  //frc::SmartDashboard::PutString("DB/String 0", visionTable->GetString("visionTargetXPos", "-1"));
-  double sliderPos = -1;
-  double visionTargetXPos = frc::SmartDashboard::GetNumber("visionTargetXPos", -1);
-  if (visionTargetXPos == -1) {
-    sliderPos = -1;
-  } else 
-  {
-    sliderPos = (visionTargetXPos - 320) / 128;
-  }
-  
-  
-  frc::SmartDashboard::PutNumber("DB/Slider 0", sliderPos);
+void Robot::TestPeriodic() {
 
   //If testing encoders, use motion profiles to servo to position
 //  this->m_pRightTrack->SetTargetMotionProfileTarget(rPower * 4096 * 5);
 //  this->m_pLeftTrack->SetTargetMotionProfileTarget(lPower * 4096 * 5);
 
 }
-
-void Robot::TestPeriodic() {}
 
 #ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }

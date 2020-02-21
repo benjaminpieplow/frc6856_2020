@@ -33,3 +33,7 @@ void ControllerInput::setLeftRumble(double power) {
 void ControllerInput::setRightRumble(double power) {
     this->m_pController->SetRumble(frc::GenericHID::RumbleType::kRightRumble, power);
 }
+
+double ControllerInput::getRTrigger() {
+    return this->m_pController->GetRawAxis(3);
+}

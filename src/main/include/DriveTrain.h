@@ -53,6 +53,8 @@ class AdvancedDrive {
     //Acceleration-Corrected, Velocity-Matching, Ramping tank drive
     void VelocityTank(double joyX, double joyY);
 
+    void VelocityTank(double joyX, double joyY, double joyBoost);
+
     void SetTargetMotionProfileTarget(double target);
 
     private:
