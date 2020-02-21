@@ -31,14 +31,17 @@ Shooter::Shooter(int CANID) {
      * TODO: Tune PIDs
      */
     this->m_pShooterMotor->SelectProfileSlot(0, 0);
-    this->m_pShooterMotor->Config_kF(0, 0.3, 10);
-    this->m_pShooterMotor->Config_kP(0, 0.01, 10); //LAST: 0.04
-    this->m_pShooterMotor->Config_kI(0, 0.0005, 10); //LAST: 0.0
-    this->m_pShooterMotor->Config_kD(0, 0.6, 10); //LAST: 0.0
+    this->m_pShooterMotor->Config_kF(0, 0.03, 10);   //LAST: 0.3
+    this->m_pShooterMotor->Config_kP(0, 0.05, 10); //LAST: 0.05
+    this->m_pShooterMotor->Config_kI(0, 0.001, 10); //LAST: 0.001
+    this->m_pShooterMotor->Config_kD(0, 1.2, 10); //LAST: 1.2
 
-    this->m_pShooterMotor->Config_IntegralZone(0, 500, 10);
+    this->m_pShooterMotor->ConfigMaxIntegralAccumulator(0, 100000, 10);
 
-    this->m_pShooterMotor->ConfigClosedloopRamp(0.10);
+//    this->m_pShooterMotor->Config_IntegralZone(0, 500, 10);
+//    this->m_pShooterMotor->Config
+
+//    this->m_pShooterMotor->ConfigClosedloopRamp(0.10);
 }
 
 

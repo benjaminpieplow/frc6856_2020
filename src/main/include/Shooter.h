@@ -41,7 +41,7 @@ class Shooter {
 
     private:
     //Target RPM
-    double mShooterTargetRPM = 500;
+    double mShooterTargetRPM = 3000;
 
     //Sample Rate Multiplier
     const double mSampleRateModifier = 10;
