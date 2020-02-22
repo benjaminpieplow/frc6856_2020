@@ -25,7 +25,7 @@ void Robot::RobotInit() {
   this->m_pRightTrack = new AdvancedDrive(8, 4);
 
   //Shooter Falcon
-  this->m_pTestShooter = new Shooter(40);
+  this->m_pTestShooter = new Shooter(40, 16);
 
   //Turret System
   this->m_pTestTurret = new Turret(16);
@@ -173,7 +173,8 @@ void Robot::TestPeriodic() {
   double visionTargetXRatio = visionTargetXPos / (320) - 1;
   frc::SmartDashboard::PutNumber("DB/Slider 1", visionTargetXRatio);
 
-  this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX() * -0.5);
+//  this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX() * -0.5);
+  this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX());
 
 
 }

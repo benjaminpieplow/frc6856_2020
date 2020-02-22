@@ -10,7 +10,7 @@
 
 class Shooter {
     public:
-    Shooter(int CANID);
+    Shooter(int ShooterCANID, int FeederCANID);
     ~Shooter();
 
     //How many encoder ticks map to one revolution of the accelerator shaft
@@ -26,6 +26,8 @@ class Shooter {
 
     //For testing and Development
     void ShooterPower(double power);
+
+    void FeedPower(double power);
 
     //Returns the current target RPM
     double GetShooterRPM();
@@ -61,6 +63,7 @@ class Shooter {
     
     //Shooter Motor
     WPI_TalonFX* m_pShooterMotor;
+    WPI_TalonSRX* m_pFeedMotor;
 
     //Ultrasonic Sensor
     frc::SerialPort* m_pRangerSerial;

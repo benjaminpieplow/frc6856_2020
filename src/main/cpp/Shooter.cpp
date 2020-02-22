@@ -1,9 +1,11 @@
 
 #include <Shooter.h>
 
-Shooter::Shooter(int CANID) {
+Shooter::Shooter(int ShooterCANID, int FeedCANID) {
 
-    m_pShooterMotor = new WPI_TalonFX(CANID);
+    m_pShooterMotor = new WPI_TalonFX(ShooterCANID);
+
+    m_pFeedMotor = new WPI_TalonSRX(FeedCANID);
 
     m_pRangerSerial = new frc::SerialPort(9600, frc::SerialPort::kOnboard, 8, frc::SerialPort::Parity::kParity_None, frc::SerialPort::StopBits::kStopBits_One);
 
@@ -73,6 +75,11 @@ void Shooter::ShooterPower(double power) {
 
 double Shooter::GetShooterRPM() {
     return this->mShooterTargetRPM;
+}
+
+
+void Shooter::FeedPower(double power) {
+    this->m_pFeedMotor->Set(ControlMode::PercentOutput, power);
 }
 
 
