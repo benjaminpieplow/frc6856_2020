@@ -116,29 +116,6 @@ void Robot::TeleopPeriodic() {
   this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY());
 
 
-  //Drive Ratio
-//  double lPower = 0.0;
-//  double rPower = 0.0;
-
-  //This ratio works for the drivers (NOTE: robot direction is inverted because it moves 'nicer' with the battery in the back)
-//  double forwardSpeed = m_pPrimaryController->getJoyY() * 0.75;
-//  double turnSpeed = m_pPrimaryController->getJoyX() * 0.35;
-
-  //Basic tank-drive algorithm
-//  rPower = (forwardSpeed + turnSpeed);
-//  lPower = (-forwardSpeed + turnSpeed);
-
-  //Good old fasioned Tank Drive
-//  this->m_pLeftTrack->SetPWM(lPower);
-//  this->m_pRightTrack->SetPWM(rPower);
-
-  //Experiment with Rumble
-//  if (m_pPrimaryController->getJoyX() > 0) {
-//    this->m_pPrimaryController->setRightRumble(m_pPrimaryController->getJoyX());
-//  } else if (m_pPrimaryController->getJoyX() < 0) {
-//    m_pPrimaryController->setLeftRumble(m_pPrimaryController->getJoyX() * -1);
-//  }
-
   //Begin Crude Vision Playground
   //frc::SmartDashboard::PutNumber("DB/String 0",  visionTable->GetNumber("visionTargetXPos", -1) );
   //frc::SmartDashboard::PutString("DB/String 0", visionTable->GetString("visionTargetXPos", "-1"));
@@ -150,7 +127,6 @@ void Robot::TeleopPeriodic() {
   {
     sliderPos = (visionTargetXPos - 320) / 128;
   }
-  
   
   frc::SmartDashboard::PutNumber("DB/Slider 0", sliderPos);
 

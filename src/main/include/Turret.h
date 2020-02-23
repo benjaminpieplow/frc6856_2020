@@ -31,6 +31,7 @@ class Turret {
 
     //Servo to an angle from center in degrees
     void SetTurretAngle(double angle);
+    void SetTurretTarget(double position);
 
     private:
     //Motor that rotates the turret
