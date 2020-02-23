@@ -7,8 +7,6 @@ Shooter::Shooter(int ShooterCANID, int FeedCANID) {
 
     m_pFeedMotor = new WPI_TalonSRX(FeedCANID);
 
-    m_pRangerSerial = new frc::SerialPort(9600, frc::SerialPort::kOnboard, 8, frc::SerialPort::Parity::kParity_None, frc::SerialPort::StopBits::kStopBits_One);
-
     this->m_pShooterMotor->ConfigFactoryDefault();
 
     this->m_pShooterMotor->ConfigVoltageCompSaturation(10,10);

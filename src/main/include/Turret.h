@@ -10,8 +10,6 @@ class Turret {
     Turret(int CANID);
     ~Turret();
 
-    void SetTurretPower(double power);
-
     //Returns true when turret is aimed at target
     bool GetLockState();
 
@@ -28,7 +26,11 @@ class Turret {
     //Returns the angle of the target relative to the frame
     double GetFrameTargetAngle();
 
+    //For testing (or backup), set the power to the turret motor.
+    void SetTurretPower(double power);
 
+    //Servo to an angle from center in degrees
+    void SetTurretAngle(double angle);
 
     private:
     //Motor that rotates the turret
@@ -48,8 +50,8 @@ class Turret {
     //Camera FOV
     const double pCameraXFOV = 61;
     const double pCameraYFOV = 34.3;
-    //Encoder to turret ratio
-    const double pEncoderTurretRatio = 2940;
+    //Number of encoder ticks per turret degree 
+    const double pEncoderTicksPerDegree = (360 * 48 * 33.02) / 2.8575; //Was 2940;
 
     //Calculated Constants
     const double pCameraFOVResRatio = 2 / this->pCameraXRes;
