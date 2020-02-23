@@ -212,6 +212,9 @@ void AdvancedDrive::InitVelocityControl() {
     this->pTalonSRX->Config_kI(0, 0.01, 10); //LAST: 0.01
     this->pTalonSRX->Config_kD(0, 6.0, 10); //LAST: 6.0
 
+    this->pTalonSRX->ConfigMotionAcceleration(500, 10);
+    this->pTalonSRX->ConfigMotionCruiseVelocity(500, 10);
+
 }
 
 void AdvancedDrive::SetTargetVelocity(double targetVel) {
