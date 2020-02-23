@@ -20,8 +20,14 @@ class Intake {
     void ActivateIntake();
     void StopIntake();
     void StowIntake();
+    void ReverseIntake();
 
-    //Pneumatic Actions
+    private:
+    double mIntakePower = 0.25;
+
+    WPI_TalonSRX* m_pIntakeMotor;
+
+    //Actuation Actions
     void RaiseIntake();
     void LowerIntake();
 
@@ -29,12 +35,5 @@ class Intake {
     void IntakeForward();
     void IntakeReverse();
     void IntakeOff();
-
-    private:
-    double mIntakePower = 0.25;
-
-    WPI_TalonSRX* m_pIntakeMotor;
-
-    PneumaticActuator* m_pIntakeArmActuator;
     
 };

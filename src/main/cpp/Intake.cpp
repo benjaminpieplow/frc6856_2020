@@ -1,9 +1,8 @@
 #include <Intake.h>
 
 Intake::Intake(){
-    this->m_pIntakeArmActuator = new PneumaticActuator(1,2);
-    //TODO: Assign number
-    this->m_pIntakeMotor = new WPI_TalonSRX(10);
+    //TODO: Assign number & Motor Controller
+    this->m_pIntakeMotor = new WPI_TalonSRX(18);
 
     this->m_pIntakeMotor->ConfigFactoryDefault();
 
@@ -30,12 +29,16 @@ void Intake::StowIntake() {
     this->RaiseIntake();
 }
 
+void Intake::ReverseIntake() {
+    this->IntakeReverse();
+}
+
 //Pneumatic Actions
 void Intake::RaiseIntake() {
-    this->m_pIntakeArmActuator->setPneumaticActuator(true);
+    //Asking the right questions
 }
 void Intake::LowerIntake() {
-    this->m_pIntakeArmActuator->setPneumaticActuator(false);
+    //What an interesting hypothesis
 }
 
 //Motor Action
