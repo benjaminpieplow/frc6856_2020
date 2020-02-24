@@ -18,8 +18,11 @@ public:
     void Volley();
     
 private:
+
+    //Pointers to Control objects
     Elevator* m_pElevator;
     Shooter* m_pShooter;
     Turret* m_pTurret;
 
+    double taskStartTime = 0;
 };

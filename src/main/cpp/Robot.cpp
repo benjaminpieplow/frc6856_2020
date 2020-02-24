@@ -28,7 +28,7 @@ void Robot::RobotInit() {
   this->m_pTestShooter = new Shooter(40, 16);
 
   //Turret System
-  this->m_pTestTurret = new Turret(16);
+  this->m_pTestTurret = new Turret(26);
 
   //Enable ramped power control
 //  this->m_pLeftTrack->InitSimpleRampedControl();
@@ -137,19 +137,23 @@ void Robot::TeleopPeriodic() {
 }
 
 void Robot::TestPeriodic() {
+  /**
   double currentRPM = m_pTestShooter->GetShooterRPM();
   double newRPM = currentRPM + 10 * this->m_pPrimaryController->getJoyY() * -1;
   this->m_pTestShooter->EnableShooter(newRPM);
   frc::SmartDashboard::PutNumber("DB/Slider 0", newRPM / 1000);
 
 
-  this->m_pTestShooter->EnableShooter();
-
   double visionTargetXPos = frc::SmartDashboard::GetNumber("visionTargetXPos", -1);
   double visionTargetXRatio = visionTargetXPos / (320) - 1;
   frc::SmartDashboard::PutNumber("DB/Slider 1", visionTargetXRatio);
 
+  */
+
 //  this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX() * -0.5);
+
+  this->m_pTestShooter->EnableShooter();
+
   this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX());
 
 

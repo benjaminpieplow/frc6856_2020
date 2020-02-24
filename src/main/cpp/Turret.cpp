@@ -28,6 +28,12 @@ Turret::Turret(int CANID) {
 
     this->m_pTurretServo->ConfigMotionCruiseVelocity(100, 10);
     this->m_pTurretServo->ConfigMotionAcceleration(100, 0);
+
+    //A solid 2 hours of work went into this line because yours truly did not realize it was an overloaded function
+    this->m_pTurretServo->ConfigForwardLimitSwitchSource(RemoteLimitSwitchSource::RemoteLimitSwitchSource_RemoteTalonSRX, LimitSwitchNormal_NormallyClosed, 40, 0);
+    this->m_pTurretServo->ConfigReverseLimitSwitchSource(RemoteLimitSwitchSource::RemoteLimitSwitchSource_RemoteTalonSRX, LimitSwitchNormal_NormallyClosed, 40, 0);
+    
+
 }
 
 //Returns the angle of the target relative to the turret in degrees
