@@ -15,6 +15,7 @@ class Turret {
 
     //Returns the angle of the target relative to the turret in degrees
     double GetFOVTargetXAngle();
+
     //Converts from FOVTargetFactor to FOVTargetAngle
     double GetFOVTargetAngle(double FOVTargetFactor);
 
@@ -53,6 +54,8 @@ class Turret {
     const double pCameraYFOV = 34.3;
     //Number of encoder ticks per turret degree 
     const double pEncoderTicksPerDegree = (360 * 48 * 33.02) / 2.8575; //Was 2940;
+    //Maximum allowable Error between turret and target in degrees
+    const double pAllowableTurretError = 5;
 
     //Calculated Constants
     const double pCameraFOVResRatio = 2 / this->pCameraXRes;

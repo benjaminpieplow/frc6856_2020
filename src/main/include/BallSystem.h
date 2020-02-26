@@ -13,7 +13,7 @@ public:
     BallSystem(Elevator* pElevatorPointer, Shooter* pShooterPointer, Turret* pTurretPointer);
     ~BallSystem();
 
-    void RunIntake();
+    void StartIntake();
 
     void Volley();
     

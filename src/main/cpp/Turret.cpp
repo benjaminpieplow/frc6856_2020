@@ -32,8 +32,13 @@ Turret::Turret(int CANID) {
     //A solid 2 hours of work went into this line because yours truly did not realize it was an overloaded function
     this->m_pTurretServo->ConfigForwardLimitSwitchSource(RemoteLimitSwitchSource::RemoteLimitSwitchSource_RemoteTalonSRX, LimitSwitchNormal_NormallyClosed, 40, 0);
     this->m_pTurretServo->ConfigReverseLimitSwitchSource(RemoteLimitSwitchSource::RemoteLimitSwitchSource_RemoteTalonSRX, LimitSwitchNormal_NormallyClosed, 40, 0);
-    
+}
 
+/**
+ * If the turret is within a preset error margin from the target, returns true
+ */
+bool Turret::GetLockState() {
+    return (this->GetFOVTargetXAngle() > this->pAllowableTurretError);
 }
 
 //Returns the angle of the target relative to the turret in degrees

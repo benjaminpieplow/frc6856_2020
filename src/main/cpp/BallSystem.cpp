@@ -12,11 +12,16 @@ BallSystem::~BallSystem()
 {
 }
 
-void BallSystem::RunIntake() {
+void BallSystem::StartIntake() {
     //TODO:
 }
 
 void BallSystem::Volley() {
+
+    if (this->m_pTurret->GetLockState()) {
+        //Fire when ready!
+    }
+
     this->m_pShooter->EnableShooter();
 
     if (this->m_pShooter->ShooterReady()) {
