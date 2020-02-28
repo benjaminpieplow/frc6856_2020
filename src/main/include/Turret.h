@@ -58,9 +58,11 @@ class Turret {
     double mCameraTargetHPos = this->mCameraXRes / 2;
 
     //Whether the turret is homed
-    bool m_Homed = false;
+    bool mHomed = false;
     //Whether an attempt is being made to change that
-    bool m_Homing = false;
+    bool mHoming = false;
+    //Whether the left limit switch has been hit during a homing maneuver
+    bool mZeroing = false;
 
 //Constants
     //Camera Resolution
@@ -76,8 +78,11 @@ class Turret {
     //Maximum allowable Error between turret and target in degrees
     const double mAllowableTurretError = 5;
 
-    //Offset between homing limit switch and turret zero (pointing directly backwards) in degrees
-    const double mHomeFrameOffset = 100;
+    //Offset between homing limit switch and turret zero (pointing directly backwards) in degrees, should be negative
+    const double mHomeFrameOffset = -100;
+
+    //Power with which to home (TODO: Update to velocity)
+    const double mHomeVelocity = 30;
 
     //Calculated Constants
     const double mCameraFOVXResRatio = 2 / this->mCameraXRes;

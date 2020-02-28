@@ -103,15 +103,15 @@ bool Turret::GetTurretLocked() {
  */
 bool Turret::GetHomed() {
     //If homing, let RunAutoHome handle this
-    if (m_Homing) {
+    if (mHoming) {
         this->RunAutoHome();
-        return this->m_Homed;
+        return this->mHomed;
     }
 
     //If we're lost, find the way
-    if (!this->m_Homed) {
+    if (!this->mHomed) {
         this->RunAutoHome();
-        return this->m_Homed;
+        return this->mHomed;
     }
     
     //If not homing, check to see if something has gone wrong
@@ -122,15 +122,15 @@ bool Turret::GetHomed() {
     //If either of the limit switches have been hit, we're lost
     if (stickies.ForwardLimitSwitch || stickies.ReverseLimitSwitch) {
         //Set the system to lost
-        this->m_Homed = false;
+        this->mHomed = false;
         //Start working on a fix
         this->RunAutoHome();
         //Tell the caller that we're lost (RunAutoHome should have set to false)
-        return this->m_Homed;
+        return this->mHomed;
     }
 
     //If none of the above returns have run, we should be in the clear!
-    return this->m_Homed;
+    return this->mHomed;
     
 }
 
@@ -138,10 +138,49 @@ bool Turret::GetHomed() {
 /**
  * If lost, run the mechanism towards the homing limit switch
  * If at the homing limit switch, set the encoder and set faults to be cleared
- * TODO: Finish this?
+ * If moved away from homing limit switch, set homed
  */
 void Turret::RunAutoHome() {
-    
+    bool revLimitSwitch = this->m_pTurretServo->IsRevLimitSwitchClosed();
+
+    //Get Sticky Faults from Servo Talon
+    ctre::phoenix::motorcontrol::StickyFaults stickies;
+    this->m_pTurretServo->GetStickyFaults(stickies);
+
+    //Are we at the home switch?
+    if (stickies.ReverseLimitSwitch){ //Zero the sensor
+        //Calculate sensor position at home limit switch
+        double sensorOffset = this->mEncoderTicksPerDegree * this->mHomeFrameOffset;
+        this->m_pTurretServo->SetSelectedSensorPosition(sensorOffset);
+
+        //Fly back to centered
+        this->m_pTurretServo->Set(ControlMode::MotionMagic, 0);
+
+        //Update Flags
+        this->mHomed = false;
+        this->mHoming = false;
+        this->mZeroing = true;
+    }
+    //If we are not at the home switch
+    else {
+        //If m_Zeroing is true, we have just left the Home sensor and the task is complete
+        if (mZeroing) {
+            this->m_pTurretServo->ClearStickyFaults();
+            //Update Flags
+            this->mHomed = true;
+            this->mHoming = false;
+            this->mZeroing = false;
+        }
+        //If m_Zeroing is false, we are still moving towards the home switch
+        else {
+            //Aim for Home
+            this->SetTurretPower(this->mHomeVelocity);
+            //Update Flags
+            this->mHomed = false;
+            this->mHoming = true;
+            this->mZeroing = false;
+        }
+    }
 }
 
 
@@ -161,6 +200,7 @@ void Turret::SetTurretAngle(double requestAngle) {
 
 /**
  * Sets a percentoutput on the servo motor
+ * Used for homing and testing, shouldn't be
  */
 void Turret::SetTurretPower(double power) {
     this->m_pTurretServo->Set(ControlMode::PercentOutput, power);
