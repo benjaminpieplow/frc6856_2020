@@ -21,11 +21,11 @@ Autonomous::~Autonomous()
  * Stage 02 ->  Complete when 5 balls fired
  * Stage 03 ->  Engage Motion Profile
  */
-void Autonomous::InitCrudeAuton() {
+void Autonomous::InitBasicAuton() {
     this->mProgramStage = 0;
 }
 
-void Autonomous::RunCrudeAuton(Shooter* pShooter, AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive, Turret* pTurret) {
+void Autonomous::RunBasicAuton(Shooter* pShooter, AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive, Turret* pTurret) {
     switch (this->mProgramStage)
     {
     case 0:

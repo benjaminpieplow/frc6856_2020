@@ -12,10 +12,15 @@ public:
     Autonomous();
     ~Autonomous();
 
-    //Simple autonomous routine to fire the shooter and move off the line
+    //Start "Get off the line!"
     void InitCrudeAuton();
+    //
 
-    void RunCrudeAuton(Shooter* pShooter, AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive, Turret* pTurret);
+
+    //Start simple autonomous routine to fire the shooter and move off the line
+    void InitBasicAuton();
+    //Run simple autonomous routine to fire the shooter and move off the line
+    void RunBasicAuton(Shooter* pShooter, AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive, Turret* pTurret);
 
 private:
     //Keeps track of what is currently to be executed
