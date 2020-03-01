@@ -18,13 +18,13 @@ void BallSystem::StartIntake() {
 
 void BallSystem::Volley() {
 
-    if (this->m_pTurret->GetLockState()) {
+    if (this->m_pTurret->GetTurretLocked()) {
         //Fire when ready!
     }
 
     this->m_pShooter->EnableShooter();
 
     if (this->m_pShooter->ShooterReady()) {
-        this->m_pElevator->Forward();
+        this->m_pElevator->ElevatorForward();
     }
 }

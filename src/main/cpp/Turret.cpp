@@ -7,6 +7,8 @@
 Turret::Turret(int CANID) {
     this->m_pTurretServo = new WPI_TalonSRX(CANID);
 
+    this->m_pTurretServo->ConfigFactoryDefault();
+
     this->m_pTurretServo->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
     this->m_pTurretServo->SetSensorPhase(false);
     this->m_pTurretServo->SetInverted(false);
@@ -31,8 +33,8 @@ Turret::Turret(int CANID) {
     this->m_pTurretServo->ConfigMotionAcceleration(100, 0);
 
     //A solid 2 hours of work went into this line because yours truly did not realize it was an overloaded function
-    this->m_pTurretServo->ConfigForwardLimitSwitchSource(RemoteLimitSwitchSource::RemoteLimitSwitchSource_RemoteTalonSRX, LimitSwitchNormal_NormallyClosed, 40, 0);
-    this->m_pTurretServo->ConfigReverseLimitSwitchSource(RemoteLimitSwitchSource::RemoteLimitSwitchSource_RemoteTalonSRX, LimitSwitchNormal_NormallyClosed, 40, 0);
+//    this->m_pTurretServo->ConfigForwardLimitSwitchSource(RemoteLimitSwitchSource::RemoteLimitSwitchSource_RemoteTalonSRX, LimitSwitchNormal_NormallyClosed, 40, 0);
+//    this->m_pTurretServo->ConfigReverseLimitSwitchSource(RemoteLimitSwitchSource::RemoteLimitSwitchSource_RemoteTalonSRX, LimitSwitchNormal_NormallyClosed, 40, 0);
 }
 
 /**
@@ -42,6 +44,7 @@ double Turret::GetRawXPixel() {
     return frc::SmartDashboard::GetNumber("visionTargetXPos", -1);
 }
 
+
 /**
  * Get the latest target pixel, then calculate the ratio of its position on the camera frame
  */
@@ -49,7 +52,6 @@ double Turret::GetFOVXFactor() {
     double rawXPixel = this->GetRawXPixel();
     return rawXPixel * this->mCameraFOVXResRatio - 1;
 }
-
 
 /**
  * Use the provided pixel to calculate the ratio of its position on the camera frame
@@ -93,7 +95,7 @@ double Turret::GetTargetFrameAngle() {
  * Returns TRUE when GetFOVXAngle is within tolerable error margin
  */
 bool Turret::GetTurretLocked() {
-    return (this->GetFOVXAngle < this->mAllowableTurretError);
+    return (this->GetFOVXAngle() < this->mAllowableTurretError);
 }
 
 /**

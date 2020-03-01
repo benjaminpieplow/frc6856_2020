@@ -2,23 +2,38 @@
  * Moves balls from intake to turret feed
  * Includes code to push ball into shooter
  */
+#pragma once
 
 #include "ctre/Phoenix.h"
 
-class Elevator
-{
+class Elevator {
 
 public:
-    Elevator(int elevatorCANID);
+    Elevator(int elevatorCANID, int feederCANID);
     ~Elevator();
 
-    void Forward();
-    void Reverse();
+    //Elevator
+    void ElevatorForward();
+    void ElevatorReverse();
+    void ElevatorStop();
+
+    //Feeder
+    void FeederForward();
+    void FeederReverse();
+    void FeederStop();
+
+    //Shared
+    void Stop();
+
+
 
 private:
     //Elevator Motor
-    WPI_TalonFX* m_pElevatorMotor;
+    WPI_TalonSRX* m_pElevatorMotor;
+    
+    //Feeder Motor
+    WPI_TalonSRX* m_pFeederMotor;
 
-    double forwardPower = 0.5;
+    double forwardPower = 1;
     
 };

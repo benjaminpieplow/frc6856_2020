@@ -81,6 +81,39 @@ void Shooter::FeedPower(double power) {
 }
 
 
+double Shooter::GetRawYPixel() {
+    return frc::SmartDashboard::GetNumber("visionTargetYLowPos", -1);
+}
+
+double Shooter::GetFOVYFactor() {
+    double rawYPixel = this->GetRawYPixel();
+    return rawYPixel / this->mCameraYRes;
+}
+
+/**
+ * Use the provided pixel to calculate the ratio of its position on the camera frame (from 0-1)
+ */
+double Shooter::GetFOVYFactor(double rawYPixel) {
+    return rawYPixel / this->mCameraYRes;
+}
+
+/**
+ * Use the latest pixel data to calculate the angle of the target relative to the camera
+ */
+double Shooter::GetFOVYAngle() {
+    double yFactor = this->GetFOVYFactor();
+    return yFactor * this->mCameraYFOV;
+}
+
+/**
+ * Use the provided pixel data to calculate the angle of the target relative to the camera
+ */
+double Shooter::GetFOVYAngle(double yFactor) {
+    return yFactor * this->mCameraYFOV;
+}
+
+
+
 //Is the shooter ready?
 bool Shooter::ShooterReady() {
     return (!(this->ShooterUnderspeed() || this->ShooterOverspeed()));

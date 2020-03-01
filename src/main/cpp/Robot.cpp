@@ -30,14 +30,11 @@ void Robot::RobotInit() {
   //Turret System
   this->m_pTestTurret = new Turret(26);
 
-  //Enable ramped power control
-//  this->m_pLeftTrack->InitSimpleRampedControl();
-//  this->m_pRightTrack->InitSimpleRampedControl();
+  //Elevintake System
+  this->m_pElevator = new Elevator(24, 17);
 
-  //Prepares current-control
-  //DO NOT USE
-//  this->m_pLeftTrack->InitCurrentControl();
-//  this->m_pRightTrack->InitCurrentControl();
+  //Master Ball System
+  this->m_pBallSystem = new BallSystem(this->m_pElevator, this->m_pTestShooter, m_pTestTurret);
 
   //Init PIDs for Drivetrain
   this->m_pLeftTrack->InitVelocityControl();
@@ -78,7 +75,7 @@ void Robot::AutonomousInit() {
 
   if (m_autoSelected == kAutoNameCustom) {
     // Custom Auto goes here
-  } else {
+      } else {
     // Default Auto goes here
   }
 }
@@ -137,23 +134,46 @@ void Robot::TeleopPeriodic() {
 }
 
 void Robot::TestPeriodic() {
-  /**
+
   double currentRPM = m_pTestShooter->GetShooterRPM();
   double newRPM = currentRPM + 10 * this->m_pPrimaryController->getJoyY() * -1;
-  this->m_pTestShooter->EnableShooter(newRPM);
   frc::SmartDashboard::PutNumber("DB/Slider 0", newRPM / 1000);
 
+ if (this->m_pPrimaryController->getRawButton(5)) {
+     this->m_pTestShooter->EnableShooter(newRPM);
+ }
+ if (this->m_pPrimaryController->getRawButton(6)) {
+   this->m_pTestShooter->DisableShooter();
+ }
 
-  double visionTargetXPos = frc::SmartDashboard::GetNumber("visionTargetXPos", -1);
-  double visionTargetXRatio = visionTargetXPos / (320) - 1;
-  frc::SmartDashboard::PutNumber("DB/Slider 1", visionTargetXRatio);
+//  double visionTargetXPos = frc::SmartDashboard::GetNumber("visionTargetXPos", -1);
+//  double visionTargetXRatio = visionTargetXPos / (320) - 1;
+//  frc::SmartDashboard::PutNumber("DB/Slider 1", visionTargetXRatio);
 
+
+
+  if (this->m_pPrimaryController->getRawButton(1)) {
+    this->m_pElevator->ElevatorForward();
+  } else {
+    this->m_pElevator->ElevatorStop();
+  }
+
+  if (this->m_pPrimaryController->getRawButton(2)) {
+    this->m_pElevator->FeederForward();
+  } else {
+    this->m_pElevator->FeederStop();
+  }
+/**
+  if (this->m_pPrimaryController->getRawButton(3)) {
+    this->m_pTestShooter->EnableShooter();
+  } else {
+    this->m_pTestShooter->DisableShooter();
+  }
   */
 
-//  this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX() * -0.5);
 
-  this->m_pTestShooter->EnableShooter();
 
+ 
   this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX());
 
 

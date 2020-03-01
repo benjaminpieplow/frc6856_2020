@@ -7,27 +7,36 @@
 
 #include "ctre/Phoenix.h"
 #include <frc/SerialPort.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 class Shooter {
     public:
     Shooter(int ShooterCANID, int FeederCANID);
     ~Shooter();
 
-    //How many encoder ticks map to one revolution of the accelerator shaft
-    const int encoderUnitsPerRevolution = 2048;
-
     //Initiates the turret firing system using the last set RPM
     void EnableShooter();
     void EnableShooter(double targetRPM);
     void EnableAutoShooter();
 
-    //Kills the shooter
+    //Stops the shooter
     void DisableShooter();
 
     //For testing and Development
     void ShooterPower(double power);
 
     void FeedPower(double power);
+
+    //Returns the number of pixels of the target's lowest pixel from camera bottom
+    double GetRawYPixel();
+
+    //Returns a signed ratio of horizontal pixels from center to horizontal pixels
+    double GetFOVYFactor();
+    double GetFOVYFactor(double rawXPixel);
+
+    //Returns the angle (in degrees) of the target relative to the camera
+    double GetFOVYAngle();
+    double GetFOVYAngle(double xFactor);
 
     //Returns the current target RPM
     double GetShooterRPM();
@@ -43,7 +52,7 @@ class Shooter {
 
     private:
     //Target RPM
-    double mShooterTargetRPM = 3000;
+    double mShooterTargetRPM = 5500;
 
     //Sample Rate Multiplier
     const double mSampleRateModifier = 10;
@@ -51,15 +60,15 @@ class Shooter {
     //Allowed Error when checking speed (Percent)
     const double mAllowedErrorMargin = 0.1;
 
-    //AutoShooter Point-Blank RPM target
-    const double mAutoShooterBaselineRPM = 500;
-    //AutoShooter Meters per Volt
-    const double mAutoShooterMetersPerMiliVolt = 0.1;
-    //AutoShooter RPM per meter
-    //TODO: Tune
-    const double mAutoShooterRPMPerMeter = 100;
+    //How many encoder ticks map to one revolution of the accelerator shaft
+    const int encoderUnitsPerRevolution = 2048;
 
-
+    //Camera Resolution
+    const double mCameraXRes = 640;
+    const double mCameraYRes = 480;
+    //Camera FOV
+    const double mCameraXFOV = 61;
+    const double mCameraYFOV = 34.3;
     
     //Shooter Motor
     WPI_TalonFX* m_pShooterMotor;

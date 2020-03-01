@@ -16,8 +16,11 @@
 
 #include <DriverIO.h>
 
+#include <Elevator.h>
 #include <Shooter.h>
 #include <Turret.h>
+
+#include <BallSystem.h>
 
 //Maybe we can move this somewhere else?
 #include <ntcore.h>
@@ -51,4 +54,8 @@ class Robot : public frc::TimedRobot {
   Shooter* m_pTestShooter;
 
   Turret* m_pTestTurret;
+
+  Elevator* m_pElevator;
+
+  BallSystem* m_pBallSystem;
 };
