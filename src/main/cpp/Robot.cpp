@@ -140,18 +140,13 @@ void Robot::TestPeriodic() {
   frc::SmartDashboard::PutNumber("DB/Slider 0", newRPM / 1000);
 
  if (this->m_pPrimaryController->getRawButton(5)) {
-     this->m_pTestShooter->EnableShooter(newRPM);
+//     this->m_pTestShooter->EnableShooter(newRPM);
  }
  if (this->m_pPrimaryController->getRawButton(6)) {
    this->m_pTestShooter->DisableShooter();
  }
 
-//  double visionTargetXPos = frc::SmartDashboard::GetNumber("visionTargetXPos", -1);
-//  double visionTargetXRatio = visionTargetXPos / (320) - 1;
-//  frc::SmartDashboard::PutNumber("DB/Slider 1", visionTargetXRatio);
-
-
-
+/**
   if (this->m_pPrimaryController->getRawButton(1)) {
     this->m_pElevator->ElevatorForward();
   } else {
@@ -163,18 +158,38 @@ void Robot::TestPeriodic() {
   } else {
     this->m_pElevator->FeederStop();
   }
-/**
-  if (this->m_pPrimaryController->getRawButton(3)) {
-    this->m_pTestShooter->EnableShooter();
-  } else {
-    this->m_pTestShooter->DisableShooter();
-  }
   */
 
 
+    frc::SmartDashboard::PutBoolean("DB/LED 0", false);
+    frc::SmartDashboard::PutBoolean("DB/LED 1", false);
+    frc::SmartDashboard::PutBoolean("DB/LED 2", false);
+    frc::SmartDashboard::PutBoolean("DB/LED 3", false);
 
- 
-  this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX());
+  double visionTargetXPos = frc::SmartDashboard::GetNumber("visionTargetXPos", -1);
+  double visionTargetXRatio = visionTargetXPos / (320) - 1;
+  frc::SmartDashboard::PutNumber("DB/Slider 1", visionTargetXRatio);
+/**
+ if (visionTargetXPos < 0) {
+   this->m_pTestTurret->SetTurretPower(0);
+ } else {
+   this->m_pTestTurret->SetTurretPower(visionTargetXRatio);
+ }
+*/
+
+  frc::SmartDashboard::PutNumber("DB/Slider 2", this->m_pTestTurret->GetTurretFrameAngle());
+
+  if (this->m_pPrimaryController->getRawButton(1)) {
+
+    if (this->m_pTestTurret->GetHomed()) {
+      this->m_pTestTurret->SetTurretAngle(this->m_pPrimaryController->getJoyX() * 20);
+      frc::SmartDashboard::PutBoolean("DB/LED 0", true);
+    }
+
+  } else {
+//    this->m_pTestTurret->SetTurretAngle(this->m_pPrimaryController->getJoyX() * 20);
+    this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX() * 0.3);
+  }
 
 
 }

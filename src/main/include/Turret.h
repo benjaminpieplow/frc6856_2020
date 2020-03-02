@@ -41,7 +41,7 @@ class Turret {
     void SetTurretAngle(double requestAngle);
 
     //Runs the turret into the home switch
-    void RunAutoHome();
+//    void RunAutoHome();
 
 
 
@@ -57,12 +57,17 @@ class Turret {
     //Last known horizontal pixel of the target (initialize at center)
     double mCameraTargetHPos = this->mCameraXRes / 2;
 
+
+    //If we've triggered the Reverse flag
+    bool mReverseLimitTripped = false;
+
+//BEGIN OLD HOMING CODE
     //Whether the turret is homed
     bool mHomed = false;
     //Whether an attempt is being made to change that
     bool mHoming = false;
-    //Whether the left limit switch has been hit during a homing maneuver
-    bool mZeroing = false;
+    //Whether we're on the home switch, pushing off
+    bool mZeroHit = false;
 
 //Constants
     //Camera Resolution
@@ -73,13 +78,13 @@ class Turret {
     const double mCameraYFOV = 34.3;
 
     //Number of encoder ticks per turret degree 
-    const double mEncoderTicksPerDegree = ((4096 / 360) * 48 * 33.02) / 2.8575; //Was 2940; is ((ticksperrev / degrees) * gearbox * ringdiameter) / piniondiameter
+    const double mEncoderTicksPerDegree = ((4096 / 360)  * 33.02) / 2.8575; //Was 2940; is ((ticksperrev / degrees) * gearbox * ringdiameter) / piniondiameter
 
     //Maximum allowable Error between turret and target in degrees
     const double mAllowableTurretError = 5;
 
     //Offset between homing limit switch and turret zero (pointing directly backwards) in degrees, should be negative
-    const double mHomeFrameOffset = -100;
+    const double mHomeFrameOffset = -71.54; //Hacky limit switch offset
 
     //Power with which to home (TODO: Update to velocity)
     const double mHomeVelocity = 30;

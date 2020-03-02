@@ -8,33 +8,38 @@ Turret::Turret(int CANID) {
     this->m_pTurretServo = new WPI_TalonSRX(CANID);
 
     this->m_pTurretServo->ConfigFactoryDefault();
+    //Problems? Forget about them.
+    this->m_pTurretServo->ClearStickyFaults();
 
-    this->m_pTurretServo->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
-    this->m_pTurretServo->SetSensorPhase(false);
-    this->m_pTurretServo->SetInverted(false);
-    this->m_pTurretServo->SetStatusFramePeriod(StatusFrameEnhanced::Status_13_Base_PIDF0, 10, 10);
-    this->m_pTurretServo->SetStatusFramePeriod(StatusFrameEnhanced::Status_10_MotionMagic, 10, 10);
+    //Sensor Configuration
+    this->m_pTurretServo->ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Relative, 0, 10);
+    this->m_pTurretServo->SetSensorPhase(true);     //Invert Input
+    this->m_pTurretServo->SetInverted(false);       //Output is fine
+
+    //A solid 2 hours of work went into this line because yours truly did not realize it was an overloaded function
+    this->m_pTurretServo->ConfigForwardLimitSwitchSource(RemoteLimitSwitchSource::RemoteLimitSwitchSource_RemoteTalonSRX, LimitSwitchNormal_NormallyOpen, 40, 0);
+    this->m_pTurretServo->ConfigReverseLimitSwitchSource(RemoteLimitSwitchSource::RemoteLimitSwitchSource_RemoteTalonSRX, LimitSwitchNormal_NormallyOpen, 40, 0);
+
+    //When fwd limit switch hit, "ZERO" encoder
+    this->m_pTurretServo->ConfigClearPositionOnLimitF(true, 10);
+    this->m_pTurretServo->ConfigClearPositionOnLimitR(false, 10);
 
     //Set Maximums and Targets
     this->m_pTurretServo->ConfigNominalOutputForward(0, 10);
     this->m_pTurretServo->ConfigNominalOutputReverse(0, 10);
-    this->m_pTurretServo->ConfigPeakOutputForward(1, 10);
-    this->m_pTurretServo->ConfigPeakOutputReverse(-1, 10);
+    this->m_pTurretServo->ConfigPeakOutputForward(0.10, 10);
+    this->m_pTurretServo->ConfigPeakOutputReverse(-0.10, 10);
 
     //Set PIDs
     this->m_pTurretServo->SelectProfileSlot(0, 0);
-    this->m_pTurretServo->Config_kF(0, 0.0, 10); //LAST: 0.0
-    this->m_pTurretServo->Config_kP(0, 0.0, 10); //LAST: 0.0
+    this->m_pTurretServo->Config_kF(0, 0, 10); //LAST: 0.0
+    this->m_pTurretServo->Config_kP(0, 0.8, 10); //LAST: 0.0
     this->m_pTurretServo->Config_kI(0, 0.0, 10); //LAST: 0.0
     this->m_pTurretServo->Config_kD(0, 0.0, 10); //LAST: 0.0
 
-    //Motion Profile Properties in case we get an encoder
-    this->m_pTurretServo->ConfigMotionCruiseVelocity(100, 10);
+    //Motion Profile Properties to avoid jerky movements
+    this->m_pTurretServo->ConfigMotionCruiseVelocity(200, 10);
     this->m_pTurretServo->ConfigMotionAcceleration(100, 0);
-
-    //A solid 2 hours of work went into this line because yours truly did not realize it was an overloaded function
-//    this->m_pTurretServo->ConfigForwardLimitSwitchSource(RemoteLimitSwitchSource::RemoteLimitSwitchSource_RemoteTalonSRX, LimitSwitchNormal_NormallyClosed, 40, 0);
-//    this->m_pTurretServo->ConfigReverseLimitSwitchSource(RemoteLimitSwitchSource::RemoteLimitSwitchSource_RemoteTalonSRX, LimitSwitchNormal_NormallyClosed, 40, 0);
 }
 
 /**
@@ -98,22 +103,43 @@ bool Turret::GetTurretLocked() {
     return (this->GetFOVXAngle() < this->mAllowableTurretError);
 }
 
+
+bool Turret::GetHomed() {
+
+    ctre::phoenix::motorcontrol::StickyFaults stickies;
+    this->m_pTurretServo->GetStickyFaults(stickies);
+
+    if (stickies.ForwardLimitSwitch) {
+        this->SetTurretPower(-0.1);
+        this->mReverseLimitTripped = false;
+        return false;
+    } else if (stickies.ReverseLimitSwitch || this->mReverseLimitTripped) {
+        this->SetTurretPower(0.1);
+        this->mReverseLimitTripped = true;
+        return false;
+    } else {
+        this->m_pTurretServo->ClearStickyFaults();
+        return true;
+    }
+
+}
+
 /**
  * Checks the limit switch sticky flags on the servo and the Homed object
  * If any of them are awry, flag the system as not-homed and return false
  * Otherwise, return true
- */
+ 
 bool Turret::GetHomed() {
     //If homing, let RunAutoHome handle this
     if (mHoming) {
         this->RunAutoHome();
-        return this->mHomed;
+        return false;
     }
 
     //If we're lost, find the way
-    if (!this->mHomed) {
+    if (!(this->mHomed)) {
         this->RunAutoHome();
-        return this->mHomed;
+        return false;
     }
     
     //If not homing, check to see if something has gone wrong
@@ -122,7 +148,7 @@ bool Turret::GetHomed() {
     this->m_pTurretServo->GetStickyFaults(stickies);
 
     //If either of the limit switches have been hit, we're lost
-    if (stickies.ForwardLimitSwitch || stickies.ReverseLimitSwitch) {
+    if (stickies.ReverseLimitSwitch) {
         //Set the system to lost
         this->mHomed = false;
         //Start working on a fix
@@ -130,61 +156,66 @@ bool Turret::GetHomed() {
         //Tell the caller that we're lost (RunAutoHome should have set to false)
         return this->mHomed;
     }
+    if (stickies.ForwardLimitSwitch) {
+        this->RunAutoHome();
+        return false;
+    }
+
+    //TODO: Driver Override
 
     //If none of the above returns have run, we should be in the clear!
     return this->mHomed;
     
 }
-
+*/
 
 /**
  * If lost, run the mechanism towards the homing limit switch
  * If at the homing limit switch, set the encoder and set faults to be cleared
  * If moved away from homing limit switch, set homed
- */
+ 
 void Turret::RunAutoHome() {
-    bool revLimitSwitch = this->m_pTurretServo->IsRevLimitSwitchClosed();
 
+    
     //Get Sticky Faults from Servo Talon
     ctre::phoenix::motorcontrol::StickyFaults stickies;
     this->m_pTurretServo->GetStickyFaults(stickies);
 
-    //Are we at the home switch?
-    if (stickies.ReverseLimitSwitch){ //Zero the sensor
-        //Calculate sensor position at home limit switch
-        double sensorOffset = this->mEncoderTicksPerDegree * this->mHomeFrameOffset;
-        this->m_pTurretServo->SetSelectedSensorPosition(sensorOffset);
-
-        //Fly back to centered
-        this->m_pTurretServo->Set(ControlMode::MotionMagic, 0);
-
+    //If we're coming off the limit switch, clear limits 
+    if (mZeroHit && !stickies.ForwardLimitSwitch) {
+        this->m_pTurretServo->ClearStickyFaults(10);
+        this->mHomed = true;
+        this->mHoming = false;
+        this->mZeroHit = false;
+        this->SetTurretAngle(0);
+        frc::SmartDashboard::PutBoolean("DB/LED 3", true);
+        
+    }
+    //If we are on the home limit switch
+    else if (stickies.ForwardLimitSwitch) {
+        //Fly away from the home switch
+        this->SetTurretPower(-0.1);
+        //Forget the bad times (check on next iteration)
+        this->m_pTurretServo->ClearStickyFaults();
         //Update Flags
         this->mHomed = false;
         this->mHoming = false;
-        this->mZeroing = true;
+        this->mZeroHit = true;
+        frc::SmartDashboard::PutBoolean("DB/LED 2", true);
     }
-    //If we are not at the home switch
+    //If we are not on the home limit switch
     else {
-        //If m_Zeroing is true, we have just left the Home sensor and the task is complete
-        if (mZeroing) {
-            this->m_pTurretServo->ClearStickyFaults();
-            //Update Flags
-            this->mHomed = true;
-            this->mHoming = false;
-            this->mZeroing = false;
-        }
-        //If m_Zeroing is false, we are still moving towards the home switch
-        else {
-            //Aim for Home
-            this->SetTurretPower(this->mHomeVelocity);
-            //Update Flags
-            this->mHomed = false;
-            this->mHoming = true;
-            this->mZeroing = false;
-        }
+        //Fly towards the home switch
+        this->SetTurretPower(0.1);
+        //Clear the faults so we can check again next time
+        this->m_pTurretServo->ClearStickyFaults();
+        //Update Flags
+        this->mHomed = false;
+        this->mHoming = true;
+        frc::SmartDashboard::PutBoolean("DB/LED 1", true);
     }
 }
-
+*/
 
 /**
  * If turret is homed, converts from target angle to target ticks, then pushes to Talon servo
@@ -192,12 +223,11 @@ void Turret::RunAutoHome() {
  */
 void Turret::SetTurretAngle(double requestAngle) {
 
-    if (this->GetHomed()) {
+    //TODO: if (this->GetHomed())
 
-    }
-    double absoluteAngle = requestAngle + 90 + mHomeFrameOffset;
-    double absolutePosition = absoluteAngle * this->mEncoderTicksPerDegree;
-    this->m_pTurretServo->Set(ControlMode::MotionMagic, absolutePosition);
+    double targetEncoderPosition = requestAngle * this->mEncoderTicksPerDegree + this->mHomeFrameOffset * this->mEncoderTicksPerDegree;
+
+    this->m_pTurretServo->Set(ControlMode::MotionMagic, targetEncoderPosition);
 }
 
 /**
