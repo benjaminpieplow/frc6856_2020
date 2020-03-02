@@ -1,5 +1,5 @@
 /**
- * Code for the intake mechanism's motors and pneumatics
+ * Code for the intake mechanism's motors
  * TODO: Build it
  * TODO: Code it
  * TODO: Map controls to actions
@@ -12,7 +12,7 @@
 
 class Intake {
     public:
-    Intake();
+    Intake(int armCANID);
     ~Intake();
 
     //SubSystem Interactions
