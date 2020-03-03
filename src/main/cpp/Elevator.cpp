@@ -44,3 +44,7 @@ void Elevator::Stop() {
     this->m_pElevatorMotor->Set(ControlMode::PercentOutput, 0);
     this->m_pFeederMotor->Set(ControlMode::PercentOutput, 0);
 }
+
+void Elevator::SetElevatorPower(double power) {
+    this->m_pElevatorMotor->Set(ControlMode::PercentOutput, power);
+}

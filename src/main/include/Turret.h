@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "ctre/Phoenix.h"
+#include <ctre/Phoenix.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 class Turret {
@@ -30,18 +30,21 @@ class Turret {
     //Returns the current measured angle of the target from the frame in degrees
     double GetTargetFrameAngle();
 
+    //Returns true when a valid target is being tracked
+    bool GetTargetTracked();
+
     //Returns true when the turret is within allowable shooting error margin
     bool GetTurretLocked();
 
     //If homed, return true. If not, fires "RunAutoHome"
     bool GetHomed();
 
-
     //Servo to an angle in degrees from center (-90 <-> +90)
     void SetTurretAngle(double requestAngle);
 
-    //Runs the turret into the home switch
-//    void RunAutoHome();
+
+    //Automatically locks the target, if none found goes zero
+    bool AutoTurret();
 
 
 
@@ -60,6 +63,7 @@ class Turret {
 
     //If we've triggered the Reverse flag
     bool mReverseLimitTripped = false;
+    bool mForwardLimitTripped = false;
 
 //BEGIN OLD HOMING CODE
     //Whether the turret is homed
@@ -77,14 +81,17 @@ class Turret {
     const double mCameraXFOV = 61;
     const double mCameraYFOV = 34.3;
 
+    //Turret Soft Limit
+    const int mSoftLimitFromCenter = 45;
+
     //Number of encoder ticks per turret degree 
     const double mEncoderTicksPerDegree = ((4096 / 360)  * 33.02) / 2.8575; //Was 2940; is ((ticksperrev / degrees) * gearbox * ringdiameter) / piniondiameter
 
     //Maximum allowable Error between turret and target in degrees
-    const double mAllowableTurretError = 5;
+    const double mAllowableTurretError = 2;
 
     //Offset between homing limit switch and turret zero (pointing directly backwards) in degrees, should be negative
-    const double mHomeFrameOffset = -71.54; //Hacky limit switch offset
+    const double mHomeFrameOffset = 71.54; //Hacky limit switch offset
 
     //Power with which to home (TODO: Update to velocity)
     const double mHomeVelocity = 30;

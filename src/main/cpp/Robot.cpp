@@ -10,12 +10,14 @@
 #include <iostream>
 
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <cameraserver/CameraServer.h>
 
 
 void Robot::RobotInit() {
   m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
   m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
   frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+
 
   //Initialize Objects
   //ToDo: Make this a map file
@@ -35,6 +37,9 @@ void Robot::RobotInit() {
 
   //Master Ball System
   this->m_pBallSystem = new BallSystem(this->m_pElevator, this->m_pTestShooter, m_pTestTurret);
+
+  //Intake System
+  this->m_pIntakeSystem = new Intake(27);
 
   //Init PIDs for Drivetrain
   this->m_pLeftTrack->InitVelocityControl();
@@ -166,9 +171,8 @@ void Robot::TestPeriodic() {
     frc::SmartDashboard::PutBoolean("DB/LED 2", false);
     frc::SmartDashboard::PutBoolean("DB/LED 3", false);
 
-  double visionTargetXPos = frc::SmartDashboard::GetNumber("visionTargetXPos", -1);
-  double visionTargetXRatio = visionTargetXPos / (320) - 1;
-  frc::SmartDashboard::PutNumber("DB/Slider 1", visionTargetXRatio);
+
+  this->m_pElevator->SetElevatorPower(this->m_pPrimaryController->getJoyY() * 0.5);
 /**
  if (visionTargetXPos < 0) {
    this->m_pTestTurret->SetTurretPower(0);
@@ -177,14 +181,13 @@ void Robot::TestPeriodic() {
  }
 */
 
+  frc::SmartDashboard::PutNumber("DB/Slider 1", this->m_pTestTurret->GetFOVXAngle());
   frc::SmartDashboard::PutNumber("DB/Slider 2", this->m_pTestTurret->GetTurretFrameAngle());
+  frc::SmartDashboard::PutNumber("DB/Slider 3", this->m_pTestTurret->GetTargetFrameAngle());
+  frc::SmartDashboard::PutBoolean("DB/LED 1", this->m_pTestTurret->GetTurretLocked());
 
   if (this->m_pPrimaryController->getRawButton(1)) {
-
-    if (this->m_pTestTurret->GetHomed()) {
-      this->m_pTestTurret->SetTurretAngle(this->m_pPrimaryController->getJoyX() * 20);
-      frc::SmartDashboard::PutBoolean("DB/LED 0", true);
-    }
+    this->m_pTestTurret->AutoTurret();
 
   } else {
 //    this->m_pTestTurret->SetTurretAngle(this->m_pPrimaryController->getJoyX() * 20);

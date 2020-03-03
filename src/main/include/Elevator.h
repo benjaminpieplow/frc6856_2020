@@ -25,6 +25,9 @@ public:
     //Shared
     void Stop();
 
+    //Testing
+    void SetElevatorPower(double power);
+
 
 
 private:

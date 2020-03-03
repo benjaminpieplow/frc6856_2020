@@ -19,6 +19,7 @@
 #include <Elevator.h>
 #include <Shooter.h>
 #include <Turret.h>
+#include <Intake.h>
 
 #include <BallSystem.h>
 
@@ -58,4 +59,6 @@ class Robot : public frc::TimedRobot {
   Elevator* m_pElevator;
 
   BallSystem* m_pBallSystem;
+
+  Intake* m_pIntakeSystem;
 };
