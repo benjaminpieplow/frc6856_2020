@@ -134,33 +134,44 @@ bool Turret::GetHomed() {
     ctre::phoenix::motorcontrol::StickyFaults stickies;
     this->m_pTurretServo->GetStickyFaults(stickies);
 
+
     /** Actual Homing Code */
-    if (stickies.ReverseLimitSwitch) {
+    if (stickies.ReverseLimitSwitch || this->mReverseLimitTripped) {
     //If at home
-        //Drive away from Home
-        this->SetTurretPower(-0.20);
-        //Clear flag if hit forward stop
+
+        //Clear flags and record routine position
         this->mForwardLimitTripped = false;
-        //Clear faults to allow checking again
+        this->mReverseLimitTripped = true;
         this->m_pTurretServo->ClearStickyFaults();
 
-        //Re-enable soft limits
-        this->m_pTurretServo->ConfigForwardSoftLimitEnable(true, 10);
-        this->m_pTurretServo->ConfigReverseSoftLimitEnable(true, 10);
+        if (this->m_pTurretServo->GetSelectedSensorPosition(0) < this->mSoftLimitFromCenter * this->mEncoderTicksPerDegree) {
+        //If we're still at home,
+            //Keep going
+            this->SetTurretPower(0.2);
+            return false;
+        } else {
+        //If we've left home,
+            //Stop leavingP
+            this->mReverseLimitTripped = false;
+            //Re-enable soft limits
+            this->m_pTurretServo->ConfigForwardSoftLimitEnable(true, 10);
+            this->m_pTurretServo->ConfigReverseSoftLimitEnable(true, 10);
+            return true;
+        }
 
 
         return false;
+
     } else if (stickies.ForwardLimitSwitch || this->mForwardLimitTripped) {
     //If far-from-home switch has been hit
-        this->SetTurretPower(-0.20);
+        this->SetTurretPower(-0.2);
         this->mForwardLimitTripped = true;
-        //Re-enable soft limits
-        this->m_pTurretServo->ConfigForwardSoftLimitEnable(true, 10);
-        this->m_pTurretServo->ConfigReverseSoftLimitEnable(true, 10);
 
         //Temporarily allow out-of-bounds running
         this->m_pTurretServo->ConfigForwardSoftLimitEnable(false, 10);
         this->m_pTurretServo->ConfigReverseSoftLimitEnable(false, 10);
+        //Clear Sticky Faults
+        this->m_pTurretServo->ClearStickyFaults();
         return false;
     } else {
     //If properly homed
@@ -176,6 +187,11 @@ bool Turret::GetHomed() {
 void Turret::SetTurretAngle(double requestAngle) {
 
     if (this->GetHomed()) {
+    frc::SmartDashboard::PutBoolean("DB/LED 0", true);
+
+    frc::SmartDashboard::PutBoolean("DB/LED 1", this->m_pTurretServo->IsFwdLimitSwitchClosed());
+    frc::SmartDashboard::PutBoolean("DB/LED 2", this->m_pTurretServo->IsRevLimitSwitchClosed());
+
     //If we're at home,
         if (abs(requestAngle) < this->mSoftLimitFromCenter) {
         //And the request is reasonable, satisfy it

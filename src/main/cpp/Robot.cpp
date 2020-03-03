@@ -49,6 +49,12 @@ void Robot::RobotInit() {
 
   //Set left track to invert Y
   this->m_pLeftTrack->SetYVelocityInvert(true);
+
+
+    frc::SmartDashboard::PutBoolean("DB/LED 0", false);
+    frc::SmartDashboard::PutBoolean("DB/LED 1", false);
+    frc::SmartDashboard::PutBoolean("DB/LED 2", false);
+    frc::SmartDashboard::PutBoolean("DB/LED 3", false);
 }
 
 /**
@@ -169,7 +175,7 @@ void Robot::TestPeriodic() {
     frc::SmartDashboard::PutBoolean("DB/LED 0", false);
     frc::SmartDashboard::PutBoolean("DB/LED 1", false);
     frc::SmartDashboard::PutBoolean("DB/LED 2", false);
-    frc::SmartDashboard::PutBoolean("DB/LED 3", false);
+//    frc::SmartDashboard::PutBoolean("DB/LED 3", false);
 
 /**
  if (visionTargetXPos < 0) {
@@ -182,7 +188,7 @@ void Robot::TestPeriodic() {
   frc::SmartDashboard::PutNumber("DB/Slider 1", this->m_pTestTurret->GetFOVXAngle());
   frc::SmartDashboard::PutNumber("DB/Slider 2", this->m_pTestTurret->GetTurretFrameAngle());
   frc::SmartDashboard::PutNumber("DB/Slider 3", this->m_pTestTurret->GetTargetFrameAngle());
-  frc::SmartDashboard::PutBoolean("DB/LED 1", this->m_pTestTurret->GetTurretLocked());
+//  frc::SmartDashboard::PutBoolean("DB/LED 1", this->m_pTestTurret->GetTurretLocked());
 
   if (this->m_pPrimaryController->getRawButton(1)) {
     this->m_pTestTurret->AutoTurret();
