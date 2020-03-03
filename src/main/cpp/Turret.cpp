@@ -138,7 +138,7 @@ bool Turret::GetHomed() {
     if (stickies.ReverseLimitSwitch) {
     //If at home
         //Drive away from Home
-        this->SetTurretPower(-0.15);
+        this->SetTurretPower(-0.20);
         //Clear flag if hit forward stop
         this->mForwardLimitTripped = false;
         //Clear faults to allow checking again
@@ -152,7 +152,7 @@ bool Turret::GetHomed() {
         return false;
     } else if (stickies.ForwardLimitSwitch || this->mForwardLimitTripped) {
     //If far-from-home switch has been hit
-        this->SetTurretPower(-0.15);
+        this->SetTurretPower(-0.20);
         this->mForwardLimitTripped = true;
         //Re-enable soft limits
         this->m_pTurretServo->ConfigForwardSoftLimitEnable(true, 10);

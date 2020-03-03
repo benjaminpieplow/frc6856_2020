@@ -19,6 +19,7 @@ class Intake {
     //Actuation Actions
     void RaiseIntake();
     void LowerIntake();
+    void HoldIntake();
     void IntakePeriodic();
 
     //You know what is its ;)
@@ -28,9 +29,9 @@ class Intake {
     private:
 
     //Intake Arm Power Setpoints
-    const double mIntakeRaisePower = -0.25;
-    const double mIntakeHoldPower = -0.05;
-    const double mIntakeLowerPower = 0.25;
+    const double mIntakeRaisePower = -0.15;
+    const double mIntakeHoldPower = 0.03;
+    const double mIntakeLowerPower = 0.10;
     //Action Time Setpoints
     const double mIntakeRaiseTime = 2;
     const double mIntakeLowerTime = 1;
@@ -42,6 +43,7 @@ class Intake {
     double mActionStartTime = 0;
     bool mLowerLatch = false;
     bool mRaiseLatch = false;
+    bool mIntakeStowed = true;
 
 
     WPI_TalonSRX* m_pIntakeMotor;

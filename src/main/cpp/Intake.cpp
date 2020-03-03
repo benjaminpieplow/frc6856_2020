@@ -50,14 +50,15 @@ void Intake::RaiseIntake() {
         this->mActionTimer.Reset();
     }
     if (this->mRaiseLatch && this->mActionTimer.HasPeriodPassed(this->mIntakeRaiseTime)) {
-        //If there is an action in progress and it should be stopped
-        this->mLowerLatch = false;
-        this->m_pIntakeMotor->Set(ControlMode::PercentOutput, this->mIntakeHoldPower);
+    //If there is an action in progress and it should be stopped
+        this->mRaiseLatch = false;
+        this->HoldIntake();
+        this->mIntakeStowed = true;
     } else if (this->mRaiseLatch && !this->mActionTimer.HasPeriodPassed(this->mIntakeRaiseTime)) {
-        //If there is an action and it should keep going
+    //If there is an action and it should keep going
         this->m_pIntakeMotor->Set(ControlMode::PercentOutput, this->mIntakeRaisePower);
     } else {
-        //If there is no action in progress, start one
+    //If there is no action in progress, start one
         this->mRaiseLatch = true;
         this->mActionTimer.Reset();
         this->mActionTimer.Start();
@@ -65,12 +66,17 @@ void Intake::RaiseIntake() {
     }
 }
 
+void Intake::HoldIntake() {
+    this->m_pIntakeMotor->Set(ControlMode::PercentOutput, this->mIntakeHoldPower);
+}
+
 void Intake::IntakePeriodic() {
     if (this->mLowerLatch) {
         this->LowerIntake();
-    } else
-    if (this->mRaiseLatch) {
+    } else if (this->mRaiseLatch) {
         this->RaiseIntake();
+    } else if (this->mIntakeStowed) {
+        this->HoldIntake();
     }
 }
 

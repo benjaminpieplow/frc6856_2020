@@ -171,8 +171,6 @@ void Robot::TestPeriodic() {
     frc::SmartDashboard::PutBoolean("DB/LED 2", false);
     frc::SmartDashboard::PutBoolean("DB/LED 3", false);
 
-
-  this->m_pElevator->SetElevatorPower(this->m_pPrimaryController->getJoyY() * 0.5);
 /**
  if (visionTargetXPos < 0) {
    this->m_pTestTurret->SetTurretPower(0);
@@ -194,6 +192,16 @@ void Robot::TestPeriodic() {
     this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX() * 0.3);
   }
 
+
+  if (this->m_pPrimaryController->getRawButton(5)) {
+    this->m_pIntakeSystem->RaiseIntake();
+  } else if (this->m_pPrimaryController->getRawButton(6)) {
+    this->m_pIntakeSystem->LowerIntake();
+  } else
+  {
+    this->m_pIntakeSystem->IntakePeriodic();
+  }
+  
 
 }
 
