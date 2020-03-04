@@ -46,8 +46,6 @@ class Turret {
     //Automatically locks the target, if none found goes zero
     bool AutoTurret();
 
-
-
     //For testing (or backup), set the power to the turret motor.
     void SetTurretPower(double power);
 
@@ -85,7 +83,7 @@ class Turret {
     const int mSoftLimitFromCenter = 45;
 
     //Number of encoder ticks per turret degree 
-    const double mEncoderTicksPerDegree = ((4096 / 360)  * 33.02) / 2.8575; //Was 2940; is ((ticksperrev / degrees) * gearbox * ringdiameter) / piniondiameter
+    const double mEncoderTicksPerDegree = ((4096 / 360)  * 33) / 3.3; //Was 2940; is ((ticksperrev / degrees)  * ringdiameter) / piniondiameter
 
     //Maximum allowable Error between turret and target in degrees
     const double mAllowableTurretError = 2;

@@ -8,6 +8,7 @@
 #include "ctre/Phoenix.h"
 #include <frc/SerialPort.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <math.h>
 
 class Shooter {
     public:
@@ -16,8 +17,8 @@ class Shooter {
 
     //Initiates the turret firing system using the last set RPM
     void EnableShooter();
+    //Initiates the turret firing system using the specified RPM
     void EnableShooter(double targetRPM);
-    void EnableAutoShooter();
 
     //Stops the shooter
     void DisableShooter();
@@ -38,6 +39,12 @@ class Shooter {
     double GetFOVYAngle();
     double GetFOVYAngle(double xFactor);
 
+    //Returns the distance of the target from the turret
+    double GetTargetDistance();
+
+    //Returns the RPM at the desired target distance
+    double GetTargetCalculatedRPM();
+
     //Returns the current target RPM
     double GetShooterRPM();
 
@@ -49,10 +56,13 @@ class Shooter {
     //Is the shooter overspeed?
     bool ShooterOverspeed();
 
+    //Spins shooter to setpoint RPM, fires when ready
+    bool AutoRPM();
+
 
     private:
     //Target RPM
-    double mShooterTargetRPM = 5500;
+    double mShooterTargetRPM = 100;
 
     //Sample Rate Multiplier
     const double mSampleRateModifier = 10;
@@ -69,6 +79,12 @@ class Shooter {
     //Camera FOV
     const double mCameraXFOV = 61;
     const double mCameraYFOV = 34.3;
+
+    //Physical Parameters
+    const double mCameraMountAngle = 5.6;      //Degrees
+    const double mTurretHeight = 0.87;          //Meters
+    const double mTargetBottomHeight = 2.159;   //Meters
+    const double mTargetCameraElevation = this->mTargetBottomHeight - this->mTurretHeight;
     
     //Shooter Motor
     WPI_TalonFX* m_pShooterMotor;

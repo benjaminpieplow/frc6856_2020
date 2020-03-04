@@ -27,8 +27,8 @@ Turret::Turret(int CANID) {
     //Set Maximums and Targets
     this->m_pTurretServo->ConfigNominalOutputForward(0, 10);
     this->m_pTurretServo->ConfigNominalOutputReverse(0, 10);
-    this->m_pTurretServo->ConfigPeakOutputForward(0.25, 10);
-    this->m_pTurretServo->ConfigPeakOutputReverse(-0.25, 10);
+    this->m_pTurretServo->ConfigPeakOutputForward(0.35, 10);
+    this->m_pTurretServo->ConfigPeakOutputReverse(-0.35, 10);
     //Soft Limits
     int forwardSoftLimit = int((this->mHomeFrameOffset + this->mSoftLimitFromCenter) * this->mEncoderTicksPerDegree);
     int reverseSoftLimit = int((this->mHomeFrameOffset - this->mSoftLimitFromCenter) * this->mEncoderTicksPerDegree);
@@ -40,13 +40,13 @@ Turret::Turret(int CANID) {
     //Set PIDs
     this->m_pTurretServo->SelectProfileSlot(0, 0);
     this->m_pTurretServo->Config_kF(0, 0, 10); //LAST: 0.0
-    this->m_pTurretServo->Config_kP(0, 0.8, 10); //LAST: 0.8
+    this->m_pTurretServo->Config_kP(0, 1.2, 10); //LAST: 0.8
     this->m_pTurretServo->Config_kI(0, 0.0, 10); //LAST: 0.0
-    this->m_pTurretServo->Config_kD(0, 0.0, 10); //LAST: 0.0
+    this->m_pTurretServo->Config_kD(0, 6.0, 10); //LAST: 0.0
 
     //Motion Profile Properties to avoid jerky movements
-    this->m_pTurretServo->ConfigMotionCruiseVelocity(400, 10);
-    this->m_pTurretServo->ConfigMotionAcceleration(200, 0);
+    this->m_pTurretServo->ConfigMotionCruiseVelocity(1200, 10);
+    this->m_pTurretServo->ConfigMotionAcceleration(800, 0);
 }
 
 /**
@@ -151,7 +151,7 @@ bool Turret::GetHomed() {
             return false;
         } else {
         //If we've left home,
-            //Stop leavingP
+            //Stop leaving
             this->mReverseLimitTripped = false;
             //Re-enable soft limits
             this->m_pTurretServo->ConfigForwardSoftLimitEnable(true, 10);
@@ -187,11 +187,6 @@ bool Turret::GetHomed() {
 void Turret::SetTurretAngle(double requestAngle) {
 
     if (this->GetHomed()) {
-    frc::SmartDashboard::PutBoolean("DB/LED 0", true);
-
-    frc::SmartDashboard::PutBoolean("DB/LED 1", this->m_pTurretServo->IsFwdLimitSwitchClosed());
-    frc::SmartDashboard::PutBoolean("DB/LED 2", this->m_pTurretServo->IsRevLimitSwitchClosed());
-
     //If we're at home,
         if (abs(requestAngle) < this->mSoftLimitFromCenter) {
         //And the request is reasonable, satisfy it
@@ -238,6 +233,8 @@ bool Turret::AutoTurret() {
     }
 
 }
+
+
 
 /**
  * Sets a percentoutput on the servo motor

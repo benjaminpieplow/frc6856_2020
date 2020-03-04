@@ -52,12 +52,7 @@ void Shooter::EnableShooter(double targetRPM) {
 }
 
 void Shooter::EnableShooter() {
-    double targetVelocity = (this->mShooterTargetRPM * this->encoderUnitsPerRevolution) / 600;
-    this->m_pShooterMotor->Set(ControlMode::Velocity, targetVelocity);
-}
-
-void Shooter::EnableAutoShooter() {
-    double targetVelocity = 0;
+    double targetVelocity = (this->mShooterTargetRPM * this->encoderUnitsPerRevolution) / (60 * this->mSampleRateModifier);
     this->m_pShooterMotor->Set(ControlMode::Velocity, targetVelocity);
 }
 
@@ -80,9 +75,19 @@ void Shooter::FeedPower(double power) {
     this->m_pFeedMotor->Set(ControlMode::PercentOutput, power);
 }
 
-
+/**
+ * Inverts pixel from SmartDashboard because OpenCV is hot garbage
+ */
 double Shooter::GetRawYPixel() {
-    return frc::SmartDashboard::GetNumber("visionTargetYLowPos", -1);
+    //Needs special treatment because OpenCV sends distance from the top
+    double visionTargetYLowPos = frc::SmartDashboard::GetNumber("visionTargetYLowPos", -1);
+    if (visionTargetYLowPos > 0) {
+    //If we have accurate data
+        return (this->mCameraYRes - visionTargetYLowPos);
+    } else {
+    //If we have bad data
+        return -1;
+    }
 }
 
 double Shooter::GetFOVYFactor() {
@@ -112,6 +117,27 @@ double Shooter::GetFOVYAngle(double yFactor) {
     return yFactor * this->mCameraYFOV;
 }
 
+/**
+ * Call GetFOVYAngle and use Trig to calculate the distance of the turret from the target
+ */
+double Shooter::GetTargetDistance() {
+    //Get the angle of the target
+    double targetAngle = this->GetFOVYAngle() + this->mCameraMountAngle;
+    //Convert to Radians
+    double targetRadians = targetAngle * (M_PI/180);
+    //Calculate distance
+    double targetDistance = this->mTargetCameraElevation / tan(targetRadians);
+
+    return targetDistance;
+}
+
+/**
+ * Returns the RPM needed to sink a ball into a target at the distance provided via GetTargetDistance
+ * TODO: Use the right number
+ */
+double Shooter::GetTargetCalculatedRPM() {
+    return this->GetTargetDistance() * 500;
+}
 
 
 //Is the shooter ready?
@@ -129,4 +155,30 @@ bool Shooter::ShooterOverspeed() {
     //Convert from Encoder Ticks per 100ms to RPM
     double measuredRPM = (this->m_pShooterMotor->GetSelectedSensorVelocity(0) * 600) / this->encoderUnitsPerRevolution;
     return (measuredRPM >= (1 + this->mAllowedErrorMargin) * this->mShooterTargetRPM);
+}
+
+/**
+ * Sets the shooter RPM to that needed to hit the target based on LemonLight's data
+ * Returns true when ready to fire
+ * TODO: Use a ratio between distance and firing speed that works
+ */
+bool Shooter::AutoRPM() {
+    if (this->GetRawYPixel() > 0) {
+    //If we're getting live data
+        //Set the required RPM
+        this->EnableShooter(this->GetTargetCalculatedRPM());
+
+        if (this->ShooterReady()) {
+        //If the shooter is at the desired RPM,
+            return true;
+        } else {
+        //If it's still adjusting speed
+            return false;
+        }
+    } else {
+    //If there's no live data
+        //Shut off the shooter
+        this->DisableShooter();
+        return false;
+    }
 }

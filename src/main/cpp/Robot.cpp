@@ -22,6 +22,7 @@ void Robot::RobotInit() {
   //Initialize Objects
   //ToDo: Make this a map file
   this->m_pPrimaryController = new ControllerInput(0);
+  this->m_pSecondaryController = new ControllerInput(1);
 
   this->m_pLeftTrack = new AdvancedDrive(2, 1);
   this->m_pRightTrack = new AdvancedDrive(8, 4);
@@ -185,18 +186,16 @@ void Robot::TestPeriodic() {
  }
 */
 
-  frc::SmartDashboard::PutNumber("DB/Slider 1", this->m_pTestTurret->GetFOVXAngle());
-  frc::SmartDashboard::PutNumber("DB/Slider 2", this->m_pTestTurret->GetTurretFrameAngle());
-  frc::SmartDashboard::PutNumber("DB/Slider 3", this->m_pTestTurret->GetTargetFrameAngle());
-//  frc::SmartDashboard::PutBoolean("DB/LED 1", this->m_pTestTurret->GetTurretLocked());
 
-  if (this->m_pPrimaryController->getRawButton(1)) {
+  if (!this->m_pPrimaryController->getRawButton(1)) {
     this->m_pTestTurret->AutoTurret();
-
+    this->m_pTestShooter->AutoRPM();
   } else {
 //    this->m_pTestTurret->SetTurretAngle(this->m_pPrimaryController->getJoyX() * 20);
     this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX() * 0.3);
   }
+
+  
 
 
   if (this->m_pPrimaryController->getRawButton(5)) {
