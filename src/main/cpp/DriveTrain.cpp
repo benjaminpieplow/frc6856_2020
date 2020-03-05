@@ -211,9 +211,6 @@ void AdvancedDrive::InitVelocityControl() {
     this->pMasterTalonSRX->Config_kI(0, 0.0, 10); //LAST: 0.0
     this->pMasterTalonSRX->Config_kD(0, 6.0, 10); //LAST: 0.0
 
-    //Snappy Robit
-//    this->pTalonSRX->Set(NeutralMode::Brake);
-//    this->pVictorSPX->Set(NeutralMode::Brake);
 }
 
 void AdvancedDrive::SetTargetVelocity(double targetVel) {

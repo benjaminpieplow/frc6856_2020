@@ -16,6 +16,8 @@ class ControllerInput
     //Returns Joystick Y Axis
     double getJoyY();
 
+    bool getRawButton(int button);
+
     //Returns right trigger
     double getRTrigger();
 

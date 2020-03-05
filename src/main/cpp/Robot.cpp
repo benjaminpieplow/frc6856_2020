@@ -136,13 +136,6 @@ void Robot::TeleopPeriodic() {
 
 }
 
-void Robot::TestPeriodic() {
-
-  //If testing encoders, use motion profiles to servo to position
-//  this->m_pRightTrack->SetTargetMotionProfileTarget(rPower * 4096 * 5);
-//  this->m_pLeftTrack->SetTargetMotionProfileTarget(lPower * 4096 * 5);
-
-}
 
 void Robot::TestPeriodic() {
 
