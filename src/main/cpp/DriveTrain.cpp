@@ -207,10 +207,9 @@ void AdvancedDrive::InitVelocityControl() {
     //Set PIDs
     this->pMasterTalonSRX->SelectProfileSlot(0, 0);
     this->pMasterTalonSRX->Config_kF(0, 0.3, 10); //LAST: 0.3
-    this->pMasterTalonSRX->Config_kP(0, 0.0, 10); //LAST: 1.6
-    this->pMasterTalonSRX->Config_kI(0, 0.0, 10); //LAST: 0.0
+    this->pMasterTalonSRX->Config_kP(0, 3.2, 10); //LAST: 1.6
+    this->pMasterTalonSRX->Config_kI(0, 0.01, 10); //LAST: 0.0
     this->pMasterTalonSRX->Config_kD(0, 6.0, 10); //LAST: 0.0
-
 }
 
 void AdvancedDrive::SetTargetVelocity(double targetVel) {
