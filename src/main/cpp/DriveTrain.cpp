@@ -182,9 +182,9 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY, double joyBoost) {
 
 
     if (this->mReverseYVel == true) {
-        this->pTalonSRX->Set(ControlMode::Velocity, (inputXVel - this->currentYVel) * encoderPulsesPerRevolution);
+        this->pMasterTalonSRX->Set(ControlMode::Velocity, (inputXVel - this->currentYVel) * encoderPulsesPerRevolution);
     } else {
-        this->pTalonSRX->Set(ControlMode::Velocity, (inputXVel + this->currentYVel) * encoderPulsesPerRevolution);
+        this->pMasterTalonSRX->Set(ControlMode::Velocity, (inputXVel + this->currentYVel) * encoderPulsesPerRevolution);
     }
     
     
