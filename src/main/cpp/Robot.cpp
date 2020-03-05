@@ -144,31 +144,29 @@ void Robot::TestPeriodic() {
   double newRPM = currentRPM + 10 * this->m_pPrimaryController->getJoyY() * -1;
   frc::SmartDashboard::PutNumber("DB/Slider 0", newRPM / 1000);
 
- if (this->m_pPrimaryController->getRawButton(1)) {
+ if (this->m_pPrimaryController->getRawButton(6)) {
      this->m_pTestShooter->EnableShooter(newRPM);
  }
- if (this->m_pPrimaryController->getRawButton(2)) {
+ if (this->m_pPrimaryController->getRawButton(5)) {
    this->m_pTestShooter->DisableShooter();
  }
 
-/**
-  if (this->m_pPrimaryController->getRawButton(1)) {
-    this->m_pElevator->ElevatorForward();
-  } else {
-    this->m_pElevator->ElevatorStop();
-  }
+    frc::SmartDashboard::PutBoolean("DB/LED 0", false);
+    frc::SmartDashboard::PutBoolean("DB/LED 1", false);
+    frc::SmartDashboard::PutBoolean("DB/LED 2", false);
 
+
+  if (this->m_pPrimaryController->getRawButton(1)) {
+    this->m_pIntakeSystem->SetIntakePower(this->m_pPrimaryController->getJoyY());
+  } else {
+    this->m_pIntakeSystem->SetIntakePower(0);
+  }
   if (this->m_pPrimaryController->getRawButton(2)) {
     this->m_pElevator->FeederForward();
   } else {
     this->m_pElevator->FeederStop();
   }
-  */
 
-
-    frc::SmartDashboard::PutBoolean("DB/LED 0", false);
-    frc::SmartDashboard::PutBoolean("DB/LED 1", false);
-    frc::SmartDashboard::PutBoolean("DB/LED 2", false);
 //    frc::SmartDashboard::PutBoolean("DB/LED 3", false);
 
 /**
@@ -193,7 +191,7 @@ void Robot::TestPeriodic() {
   }
 */
 
-
+/**
   if (this->m_pPrimaryController->getRawButton(3)) {
     this->m_pElevator->FeederForward();
   } else {
@@ -210,6 +208,8 @@ void Robot::TestPeriodic() {
   {
     this->m_pIntakeSystem->IntakePeriodic();
   }
+
+  */
 
   //this->m_pElevator->SetElevatorPower(this->m_pPrimaryController->getJoyX());
   
