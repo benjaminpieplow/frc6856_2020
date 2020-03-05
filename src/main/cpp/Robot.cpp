@@ -24,8 +24,8 @@ void Robot::RobotInit() {
   this->m_pPrimaryController = new ControllerInput(0);
   this->m_pSecondaryController = new ControllerInput(1);
 
-  this->m_pLeftTrack = new AdvancedDrive(2, 1);
-  this->m_pRightTrack = new AdvancedDrive(8, 4);
+  this->m_pLeftTrack = new AdvancedDrive(10, 11);
+  this->m_pRightTrack = new AdvancedDrive(12, 13);
 
   //Shooter Falcon
   this->m_pTestShooter = new Shooter(40, 16);
@@ -45,6 +45,7 @@ void Robot::RobotInit() {
   //Init PIDs for Drivetrain
   this->m_pLeftTrack->InitVelocityControl();
   this->m_pRightTrack->InitVelocityControl();
+  //Zero the drivetrain
   this->m_pLeftTrack->VelocityTank(0,0);
   this->m_pRightTrack->VelocityTank(0,0);
 
@@ -128,16 +129,7 @@ void Robot::TeleopPeriodic() {
   //Begin Crude Vision Playground
   //frc::SmartDashboard::PutNumber("DB/String 0",  visionTable->GetNumber("visionTargetXPos", -1) );
   //frc::SmartDashboard::PutString("DB/String 0", visionTable->GetString("visionTargetXPos", "-1"));
-  double sliderPos = -1;
-  double visionTargetXPos = frc::SmartDashboard::GetNumber("visionTargetXPos", -1);
-  if (visionTargetXPos == -1) {
-    sliderPos = -1;
-  } else 
-  {
-    sliderPos = (visionTargetXPos - 320) / 128;
-  }
-  
-  frc::SmartDashboard::PutNumber("DB/Slider 0", sliderPos);
+
 
   //If testing encoders, use motion profiles to servo to position
 //  this->m_pRightTrack->SetTargetMotionProfileTarget(rPower * 4096 * 5);
@@ -147,14 +139,15 @@ void Robot::TeleopPeriodic() {
 
 void Robot::TestPeriodic() {
 
+
   double currentRPM = m_pTestShooter->GetShooterRPM();
   double newRPM = currentRPM + 10 * this->m_pPrimaryController->getJoyY() * -1;
   frc::SmartDashboard::PutNumber("DB/Slider 0", newRPM / 1000);
 
- if (this->m_pPrimaryController->getRawButton(5)) {
-//     this->m_pTestShooter->EnableShooter(newRPM);
+ if (this->m_pPrimaryController->getRawButton(1)) {
+     this->m_pTestShooter->EnableShooter(newRPM);
  }
- if (this->m_pPrimaryController->getRawButton(6)) {
+ if (this->m_pPrimaryController->getRawButton(2)) {
    this->m_pTestShooter->DisableShooter();
  }
 
@@ -187,14 +180,25 @@ void Robot::TestPeriodic() {
 */
 
 
-  if (!this->m_pPrimaryController->getRawButton(1)) {
-    this->m_pTestTurret->AutoTurret();
-    this->m_pTestShooter->AutoRPM();
+/*
+  if (this->m_pPrimaryController->getRawButton(1)) {
+    if (this->m_pTestTurret->AutoTurret()) {
+      if (this->m_pTestShooter->AutoRPM()) {
+        this->m_pElevator->FeederForward();
+      } else {
+        this->m_pElevator->ElevatorStop();
+      }
+    }
   } else {
-//    this->m_pTestTurret->SetTurretAngle(this->m_pPrimaryController->getJoyX() * 20);
-    this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX() * 0.3);
   }
+*/
 
+
+  if (this->m_pPrimaryController->getRawButton(3)) {
+    this->m_pElevator->FeederForward();
+  } else {
+    this->m_pElevator->FeederStop();
+  }
   
 
 
@@ -206,8 +210,9 @@ void Robot::TestPeriodic() {
   {
     this->m_pIntakeSystem->IntakePeriodic();
   }
-  
 
+  //this->m_pElevator->SetElevatorPower(this->m_pPrimaryController->getJoyX());
+  
 }
 
 #ifndef RUNNING_FRC_TESTS

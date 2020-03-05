@@ -25,7 +25,7 @@ class TankDrive {
 
 class AdvancedDrive {
     public:
-    AdvancedDrive(int talonCANID, int victorCANID);
+    AdvancedDrive(int masterCANID, int slaveCANID);
     ~AdvancedDrive();
     
     //Set Talons to be basic (ramped) PWM controllers
@@ -56,8 +56,8 @@ class AdvancedDrive {
     void SetTargetMotionProfileTarget(double target);
 
     private:
-    WPI_TalonSRX* pTalonSRX;
-    WPI_VictorSPX* pVictorSPX;
+    WPI_TalonSRX* pMasterTalonSRX;
+    WPI_TalonSRX* pSlaveTalonSRX;
 
     //If true, inverts Y velocity (Set on LEFT tank track)
     bool mReverseYVel = false;
