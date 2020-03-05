@@ -77,8 +77,6 @@ void AdvancedDrive::InitCurrentControl() {
     this->pMasterTalonSRX->Config_kI(0, 0.0, 10); //LAST: 0.0
     this->pMasterTalonSRX->Config_kD(0, 0.0, 10); //LAST: 0.0
 
-    this->pMasterTalonSRX->SetNeutralMode(NeutralMode::Brake);
-    this->pSlaveTalonSRX->SetNeutralMode(NeutralMode::Brake);
 }
 
 
@@ -151,7 +149,7 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY, double joyBoost) {
     const double boostSteerReductionFactor = 0.5;
 
     //Meters per Second at which the bot accelerates
-    const double rampAcceleration = 2;
+    const double rampAcceleration = 1;
 
     //Number of encoder units per rotation of the output shaft
     const double encoderPulsesPerRevolution = 1440; //360 * 4
@@ -173,10 +171,16 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY, double joyBoost) {
 
     double deltaYVel = inputYVel - this->currentYVel;
     if ((deltaYVel) > rampCorrectedAcceleration) {
+    //If the new velocity is too great of a change in the positive
+        //Add only a small change
         this->currentYVel += rampCorrectedAcceleration;
     } else if (deltaYVel < -rampCorrectedAcceleration) {
+    //If the new velocity is too great of a change in the negative
+        //Add only a small change
         this->currentYVel += -rampCorrectedAcceleration;
     } else {
+    //If the new velocity is just right
+        //Make it so
         this->currentYVel = inputYVel;
     }
 
@@ -193,7 +197,7 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY, double joyBoost) {
 void AdvancedDrive::InitVelocityControl() {
     this->pMasterTalonSRX->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
     //this->pTalonSRX->ConfigSelectedFeedbackCoefficient();
-    this->pMasterTalonSRX->SetSensorPhase(false);
+    this->pMasterTalonSRX->SetSensorPhase(true);
     this->pMasterTalonSRX->SetInverted(false);
     this->pMasterTalonSRX->SetStatusFramePeriod(StatusFrameEnhanced::Status_13_Base_PIDF0, 10, 10);
     this->pMasterTalonSRX->SetStatusFramePeriod(StatusFrameEnhanced::Status_10_MotionMagic, 10, 10);
