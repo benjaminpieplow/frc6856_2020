@@ -93,23 +93,7 @@ void Robot::AutonomousInit() {
   }
 }
 
-void Robot::AutonomousPeriodic() {
-  double sliderPos = -1;
-  double visionTargetXPos = frc::SmartDashboard::GetNumber("visionTargetXPos", -1);
-  double visionTargetXRatio = visionTargetXPos / (320) - 1;
-  if (visionTargetXPos == -1) {
-    sliderPos = -1;
-  } else 
-  {
-    sliderPos = (visionTargetXPos - 320) / 128;
-  }
-
-  frc::SmartDashboard::PutNumber("DB/Slider 0", visionTargetXRatio);
-
-  this->m_pLeftTrack->VelocityTank(visionTargetXRatio * 0.8, 0);
-  this->m_pRightTrack->VelocityTank(visionTargetXRatio * 0.8, 0);
-
-  
+void Robot::AutonomousPeriodic() {  
 }
 
 void Robot::TeleopInit() {}
