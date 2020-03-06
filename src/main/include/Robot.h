@@ -16,6 +16,13 @@
 
 #include <DriverIO.h>
 
+#include <Elevator.h>
+#include <Shooter.h>
+#include <Turret.h>
+#include <Intake.h>
+
+#include <BallSystem.h>
+
 //Maybe we can move this somewhere else?
 #include <ntcore.h>
 #include <networktables/NetworkTable.h>
@@ -39,9 +46,20 @@ class Robot : public frc::TimedRobot {
 
 //  TankDrive m_pTankDrive;
   ControllerInput* m_pPrimaryController;
+  ControllerInput* m_pSecondaryController;
 
   AdvancedDrive* m_pLeftTrack;
   AdvancedDrive* m_pRightTrack;
 
   NetworkTable* visionTable;
+
+  Shooter* m_pTestShooter;
+
+  Turret* m_pTestTurret;
+
+  Elevator* m_pElevator;
+
+  BallSystem* m_pBallSystem;
+
+  Intake* m_pIntakeSystem;
 };

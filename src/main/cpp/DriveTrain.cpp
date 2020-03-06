@@ -44,51 +44,48 @@ void TankDrive::setTankDrivePower(double forwardSpeed, double turnSpeed)
 
 
 
-AdvancedDrive::AdvancedDrive(int talonCANID, int victorCANID) {
-    this->pTalonSRX = new WPI_TalonSRX(talonCANID);
-    this->pVictorSPX = new WPI_VictorSPX(victorCANID);
+AdvancedDrive::AdvancedDrive(int masterCANID, int slaveCANID) {
+    this->pMasterTalonSRX = new WPI_TalonSRX(masterCANID);
+    this->pSlaveTalonSRX = new WPI_TalonSRX(slaveCANID);
 
-    this->pTalonSRX->ConfigFactoryDefault();
-    this->pVictorSPX->ConfigFactoryDefault();
+    this->pMasterTalonSRX->ConfigFactoryDefault();
+    this->pSlaveTalonSRX->ConfigFactoryDefault();
 
-    this->pTalonSRX->ConfigVoltageCompSaturation(10,10);
-    this->pVictorSPX->ConfigVoltageCompSaturation(10,10);
+    this->pMasterTalonSRX->ConfigVoltageCompSaturation(10,10);
+    this->pSlaveTalonSRX->ConfigVoltageCompSaturation(10,10);
 
-    this->pVictorSPX->Follow(*this->pTalonSRX);
+    this->pSlaveTalonSRX->Follow(*this->pMasterTalonSRX);
 }
 
 void AdvancedDrive::InitSimpleRampedControl() {
-    this->pTalonSRX->ConfigVoltageCompSaturation(10, 10);
-    this->pVictorSPX->ConfigVoltageCompSaturation(10, 10);
-    this->pTalonSRX->SetNeutralMode(NeutralMode::Brake);
-    this->pVictorSPX->SetNeutralMode(NeutralMode::Brake);
+    this->pMasterTalonSRX->ConfigVoltageCompSaturation(10, 10);
+    this->pSlaveTalonSRX->ConfigVoltageCompSaturation(10, 10);
+    this->pMasterTalonSRX->SetNeutralMode(NeutralMode::Brake);
+    this->pSlaveTalonSRX->SetNeutralMode(NeutralMode::Brake);
     //In (seconds), ramp output power
-    this->pTalonSRX->ConfigOpenloopRamp(0.5);
+    this->pMasterTalonSRX->ConfigOpenloopRamp(0.5);
 }
 
 void AdvancedDrive::InitCurrentControl() {
-    this->pTalonSRX->ConfigVoltageCompSaturation(10, 10);
-    this->pVictorSPX->ConfigVoltageCompSaturation(10, 10);
+    this->pMasterTalonSRX->ConfigVoltageCompSaturation(10, 10);
+    this->pSlaveTalonSRX->ConfigVoltageCompSaturation(10, 10);
     
     //Set PIDs
-    this->pTalonSRX->SelectProfileSlot(0, 0);
-    this->pTalonSRX->Config_kF(0, 1.0, 10); //LAST: 1.0     //WORKS: 1.0
-    this->pTalonSRX->Config_kP(0, 0.5, 10); //LAST: 0.1
-    this->pTalonSRX->Config_kI(0, 0.0, 10); //LAST: 0.0
-    this->pTalonSRX->Config_kD(0, 0.0, 10); //LAST: 0.0
+    this->pMasterTalonSRX->SelectProfileSlot(0, 0);
+    this->pMasterTalonSRX->Config_kF(0, 1.0, 10); //LAST: 1.0     //WORKS: 1.0
+    this->pMasterTalonSRX->Config_kP(0, 0.5, 10); //LAST: 0.1
+    this->pMasterTalonSRX->Config_kI(0, 0.0, 10); //LAST: 0.0
+    this->pMasterTalonSRX->Config_kD(0, 0.0, 10); //LAST: 0.0
 
-    //Investigate if this is causing issuese with max power
-    this->pTalonSRX->SetNeutralMode(NeutralMode::Brake);
-    this->pVictorSPX->SetNeutralMode(NeutralMode::Brake);
 }
 
 
 void AdvancedDrive::SetPWM(double power) {
-    this->pTalonSRX->Set(ControlMode::PercentOutput, power);
+    this->pMasterTalonSRX->Set(ControlMode::PercentOutput, power);
 }
 
 void AdvancedDrive::SetCurrent(double power) {
-    this->pTalonSRX->Set(ControlMode::Current, power);
+    this->pMasterTalonSRX->Set(ControlMode::Current, power);
 }
 
 void AdvancedDrive::VelocityTank(double joyX, double joyY) {
@@ -126,9 +123,9 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY) {
 
 
     if (this->mReverseYVel == true) {
-        this->pTalonSRX->Set(ControlMode::Velocity, (inputXVel - this->currentYVel) * encoderPulsesPerRevolution);
+        this->pMasterTalonSRX->Set(ControlMode::Velocity, (this->currentYVel + inputXVel) * encoderPulsesPerRevolution);
     } else {
-        this->pTalonSRX->Set(ControlMode::Velocity, (inputXVel + this->currentYVel) * encoderPulsesPerRevolution);
+        this->pMasterTalonSRX->Set(ControlMode::Velocity, (this->currentYVel + inputXVel) * encoderPulsesPerRevolution);
     }
     
 }
@@ -152,7 +149,7 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY, double joyBoost) {
     const double boostSteerReductionFactor = 0.5;
 
     //Meters per Second at which the bot accelerates
-    const double rampAcceleration = 2;
+    const double rampAcceleration = 1;
 
     //Number of encoder units per rotation of the output shaft
     const double encoderPulsesPerRevolution = 1440; //360 * 4
@@ -174,55 +171,60 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY, double joyBoost) {
 
     double deltaYVel = inputYVel - this->currentYVel;
     if ((deltaYVel) > rampCorrectedAcceleration) {
+    //If the new velocity is too great of a change in the positive
+        //Add only a small change
         this->currentYVel += rampCorrectedAcceleration;
     } else if (deltaYVel < -rampCorrectedAcceleration) {
+    //If the new velocity is too great of a change in the negative
+        //Add only a small change
         this->currentYVel += -rampCorrectedAcceleration;
     } else {
+    //If the new velocity is just right
+        //Make it so
         this->currentYVel = inputYVel;
     }
 
 
     if (this->mReverseYVel == true) {
-        this->pTalonSRX->Set(ControlMode::Velocity, (inputXVel - this->currentYVel) * encoderPulsesPerRevolution);
+        this->pMasterTalonSRX->Set(ControlMode::Velocity, (inputXVel - this->currentYVel) * encoderPulsesPerRevolution);
     } else {
-        this->pTalonSRX->Set(ControlMode::Velocity, (inputXVel + this->currentYVel) * encoderPulsesPerRevolution);
+        this->pMasterTalonSRX->Set(ControlMode::Velocity, (inputXVel + this->currentYVel) * encoderPulsesPerRevolution);
     }
     
     
 }
 
 void AdvancedDrive::InitVelocityControl() {
-    this->pTalonSRX->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
+    this->pMasterTalonSRX->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
     //this->pTalonSRX->ConfigSelectedFeedbackCoefficient();
-    this->pTalonSRX->SetSensorPhase(false);
-    this->pTalonSRX->SetInverted(false);
-    this->pTalonSRX->SetStatusFramePeriod(StatusFrameEnhanced::Status_13_Base_PIDF0, 10, 10);
-    this->pTalonSRX->SetStatusFramePeriod(StatusFrameEnhanced::Status_10_MotionMagic, 10, 10);
+    this->pMasterTalonSRX->SetSensorPhase(true);
+    this->pMasterTalonSRX->SetInverted(false);
+    this->pMasterTalonSRX->SetStatusFramePeriod(StatusFrameEnhanced::Status_13_Base_PIDF0, 10, 10);
+    this->pMasterTalonSRX->SetStatusFramePeriod(StatusFrameEnhanced::Status_10_MotionMagic, 10, 10);
 
     //Set Maximums and Targets
-    this->pTalonSRX->ConfigNominalOutputForward(0, 10);
-    this->pTalonSRX->ConfigNominalOutputReverse(0, 10);
-    this->pTalonSRX->ConfigPeakOutputForward(1, 10);
-    this->pTalonSRX->ConfigPeakOutputReverse(-1, 10);
+    this->pMasterTalonSRX->ConfigNominalOutputForward(0, 10);
+    this->pMasterTalonSRX->ConfigNominalOutputReverse(0, 10);
+    this->pMasterTalonSRX->ConfigPeakOutputForward(1, 10);
+    this->pMasterTalonSRX->ConfigPeakOutputReverse(-1, 10);
 
     //Set PIDs
-    this->pTalonSRX->SelectProfileSlot(0, 0);
-    this->pTalonSRX->Config_kF(0, 0.3, 10); //LAST: 0.3
-    this->pTalonSRX->Config_kP(0, 3.2, 10); //LAST: 1.6
-    this->pTalonSRX->Config_kI(0, 0.01, 10); //LAST: 0.01
-    this->pTalonSRX->Config_kD(0, 6.0, 10); //LAST: 6.0
+    this->pMasterTalonSRX->SelectProfileSlot(0, 0);
+    this->pMasterTalonSRX->Config_kF(0, 0.3, 10); //LAST: 0.3
+    this->pMasterTalonSRX->Config_kP(0, 3.2, 10); //LAST: 1.6
+    this->pMasterTalonSRX->Config_kI(0, 0.01, 10); //LAST: 0.0
+    this->pMasterTalonSRX->Config_kD(0, 6.0, 10); //LAST: 0.0
 
-    this->pTalonSRX->ConfigMotionAcceleration(500, 10);
-    this->pTalonSRX->ConfigMotionCruiseVelocity(500, 10);
-
+    this->pMasterTalonSRX->ConfigMotionCruiseVelocity(500, 10);
+    this->pMasterTalonSRX->ConfigMotionAcceleration(200, 10);
 }
 
 void AdvancedDrive::SetTargetVelocity(double targetVel) {
-    this->pTalonSRX->Set(ControlMode::Velocity, targetVel);
+    this->pMasterTalonSRX->Set(ControlMode::Velocity, targetVel);
 }
 
 void AdvancedDrive::SetTargetMotionProfileTarget(double target) {
-    this->pTalonSRX->Set(ControlMode::MotionMagic, target);
+    this->pMasterTalonSRX->Set(ControlMode::MotionMagic, target);
 }
 
 void AdvancedDrive::SetYVelocityInvert(bool invertState) {

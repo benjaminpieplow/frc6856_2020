@@ -26,6 +26,10 @@ double ControllerInput::getJoyY()
     return this->m_pController->GetRawAxis(1);
 }
 
+bool ControllerInput::getRawButton(int button) {
+    return this->m_pController->GetRawButton(button);
+}
+
 void ControllerInput::setLeftRumble(double power) {
     this->m_pController->SetRumble(frc::GenericHID::RumbleType::kLeftRumble, power);
 }

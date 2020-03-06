@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <cameraserver/CameraServer.h>
 
 
 void Robot::RobotInit() {
@@ -17,30 +18,45 @@ void Robot::RobotInit() {
   m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
   frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
+
   //Initialize Objects
   //ToDo: Make this a map file
   this->m_pPrimaryController = new ControllerInput(0);
+  this->m_pSecondaryController = new ControllerInput(1);
 
-  this->m_pLeftTrack = new AdvancedDrive(2, 1);
-  this->m_pRightTrack = new AdvancedDrive(8, 4);
+  this->m_pLeftTrack = new AdvancedDrive(10, 11);
+  this->m_pRightTrack = new AdvancedDrive(12, 13);
 
-  //Enable ramped power control
-//  this->m_pLeftTrack->InitSimpleRampedControl();
-//  this->m_pRightTrack->InitSimpleRampedControl();
+  //Shooter Falcon
+  this->m_pTestShooter = new Shooter(40, 16);
 
-  //Prepares current-control
-  //DO NOT USE
-//  this->m_pLeftTrack->InitCurrentControl();
-//  this->m_pRightTrack->InitCurrentControl();
+  //Turret System
+  this->m_pTestTurret = new Turret(26);
+
+  //Elevintake System
+  this->m_pElevator = new Elevator(24, 17);
+
+  //Master Ball System
+  this->m_pBallSystem = new BallSystem(this->m_pElevator, this->m_pTestShooter, m_pTestTurret);
+
+  //Intake System
+  this->m_pIntakeSystem = new Intake(27);
 
   //Init PIDs for Drivetrain
   this->m_pLeftTrack->InitVelocityControl();
   this->m_pRightTrack->InitVelocityControl();
+  //Zero the drivetrain
   this->m_pLeftTrack->VelocityTank(0,0);
   this->m_pRightTrack->VelocityTank(0,0);
 
   //Set left track to invert Y
   this->m_pLeftTrack->SetYVelocityInvert(true);
+
+
+    frc::SmartDashboard::PutBoolean("DB/LED 0", false);
+    frc::SmartDashboard::PutBoolean("DB/LED 1", false);
+    frc::SmartDashboard::PutBoolean("DB/LED 2", false);
+    frc::SmartDashboard::PutBoolean("DB/LED 3", false);
 }
 
 /**
@@ -72,17 +88,12 @@ void Robot::AutonomousInit() {
 
   if (m_autoSelected == kAutoNameCustom) {
     // Custom Auto goes here
-  } else {
+      } else {
     // Default Auto goes here
   }
 }
 
-void Robot::AutonomousPeriodic() {
-  if (m_autoSelected == kAutoNameCustom) {
-    // Custom Auto goes here
-  } else {
-    // Default Auto goes here
-  }
+void Robot::AutonomousPeriodic() {  
 }
 
 void Robot::TeleopInit() {}
@@ -109,12 +120,83 @@ void Robot::TeleopPeriodic() {
 
 }
 
+
 void Robot::TestPeriodic() {
 
-  //If testing encoders, use motion profiles to servo to position
-//  this->m_pRightTrack->SetTargetMotionProfileTarget(rPower * 4096 * 5);
-//  this->m_pLeftTrack->SetTargetMotionProfileTarget(lPower * 4096 * 5);
 
+  double currentRPM = m_pTestShooter->GetShooterRPM();
+  double newRPM = currentRPM + 10 * this->m_pPrimaryController->getJoyY() * -1;
+  frc::SmartDashboard::PutNumber("DB/Slider 0", newRPM / 1000);
+
+ if (this->m_pPrimaryController->getRawButton(6)) {
+     this->m_pTestShooter->EnableShooter(newRPM);
+ }
+ if (this->m_pPrimaryController->getRawButton(5)) {
+   this->m_pTestShooter->DisableShooter();
+ }
+
+    frc::SmartDashboard::PutBoolean("DB/LED 0", false);
+    frc::SmartDashboard::PutBoolean("DB/LED 1", false);
+    frc::SmartDashboard::PutBoolean("DB/LED 2", false);
+
+
+  if (this->m_pPrimaryController->getRawButton(1)) {
+    this->m_pIntakeSystem->SetIntakePower(this->m_pPrimaryController->getJoyY());
+  } else {
+    this->m_pIntakeSystem->SetIntakePower(0);
+  }
+  if (this->m_pPrimaryController->getRawButton(2)) {
+    this->m_pElevator->FeederForward();
+  } else {
+    this->m_pElevator->FeederStop();
+  }
+
+//    frc::SmartDashboard::PutBoolean("DB/LED 3", false);
+
+/**
+ if (visionTargetXPos < 0) {
+   this->m_pTestTurret->SetTurretPower(0);
+ } else {
+   this->m_pTestTurret->SetTurretPower(visionTargetXRatio);
+ }
+*/
+
+
+/*
+  if (this->m_pPrimaryController->getRawButton(1)) {
+    if (this->m_pTestTurret->AutoTurret()) {
+      if (this->m_pTestShooter->AutoRPM()) {
+        this->m_pElevator->FeederForward();
+      } else {
+        this->m_pElevator->ElevatorStop();
+      }
+    }
+  } else {
+  }
+*/
+
+/**
+  if (this->m_pPrimaryController->getRawButton(3)) {
+    this->m_pElevator->FeederForward();
+  } else {
+    this->m_pElevator->FeederStop();
+  }
+  
+
+
+  if (this->m_pPrimaryController->getRawButton(5)) {
+    this->m_pIntakeSystem->RaiseIntake();
+  } else if (this->m_pPrimaryController->getRawButton(6)) {
+    this->m_pIntakeSystem->LowerIntake();
+  } else
+  {
+    this->m_pIntakeSystem->IntakePeriodic();
+  }
+
+  */
+
+  //this->m_pElevator->SetElevatorPower(this->m_pPrimaryController->getJoyX());
+  
 }
 
 #ifndef RUNNING_FRC_TESTS
