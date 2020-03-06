@@ -20,6 +20,13 @@ public:
     Autonomous(Turret* pTurret, Shooter* pShooter, AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive, Elevator* pElevator);
     ~Autonomous();
 
+    /**
+     * CrudeAuton is the first auton system written, it,
+     *  Spins the shooter up to speed
+     *  Pushes balls for 5 seconds (regardless of RPM lock)
+     *  Shuts everything off
+     *  Moves forward a meter
+     */
     void CrudeAutonInit();
     void CrudeAutonPeriodic();
 

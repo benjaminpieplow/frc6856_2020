@@ -64,39 +64,65 @@ int CrudeAuton::GetStage() {
     return this->mProgramStage;
 }
 
+
+/**
+ * Uses AutoRPM to check if the shooter is at-speed.
+ * Once it is, progress to the next stage
+ */
 void CrudeAuton::RunStage00(Shooter* pShooter) {
     if (pShooter->AutoRPM()) {
         this->mProgramStage = 1;
     }
 }
 
+/**
+ * Pushes balls through the intake for 5 seconds
+ * Only runns the feed when the shooter is at speed
+ * Holds (and verifies) shooter speed using Shooter's AutoRPM
+ */
 void CrudeAuton::RunStage01(Shooter* pShooter, Elevator* pElevator) {
+    //If this is the first run
     if (!this->mStageStarted) {
+        //Clear and start the timer
         this->mStageTimer.Reset();
         this->mStageTimer.Start();
+        //Flag this stage as started
         this->mStageStarted = true;
+        //Start balls moving towards shooter
+        pElevator->ElevatorForward();
+        //If shooter is ready, give it balls
         if (pShooter->AutoRPM()) {
-            pElevator->ElevatorForward();
             pElevator->FeederForward();
         }
+    //If this stage has run its course
     } else if (this->mStageTimer.HasPeriodPassed(5)) {
+        //Clear the timer for the next use
         this->mStageTimer.Reset();
+        //Clear the Stage flag for the next guy
         this->mStageStarted = false;
+        //Advance the stage
         this->mProgramStage = 2;
 
+        //Shut down involved mechanisms
         pElevator->Stop();
         pShooter->DisableShooter();
+    //If 'cruising' in stage
     } else {
+        //Move balls towards shooter
+        pElevator->ElevatorForward();
+        //If at RPM, put balls in shooter
         if (pShooter->AutoRPM()) {
-            pElevator->ElevatorForward();
             pElevator->FeederForward();
+        //If not at RPM, no balls for shooter
         } else {
             pElevator->Stop();
         }
     }
 }
 
-
+/**
+ * Final stage of CrudeAuton, use Motion Profiles to run 1 meter
+ */
 void CrudeAuton::RunStage02(AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive) {
     pLeftDrive->SetTargetMotionProfileTarget(1);
     pRightDrive->SetTargetMotionProfileTarget(1);

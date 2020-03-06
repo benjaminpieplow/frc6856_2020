@@ -224,7 +224,14 @@ void AdvancedDrive::SetTargetVelocity(double targetVel) {
 }
 
 void AdvancedDrive::SetTargetMotionProfileTarget(double target) {
-    this->pMasterTalonSRX->Set(ControlMode::MotionMagic, target);
+    //TODO: Switch constants over to private members
+    //Number of encoder units per rotation of the output shaft
+    const double encoderPulsesPerRevolution = 1440; //360 * 4
+    //1 / ((Pi) * (Tire Diameter))
+    const double revolutionsPerMeter = 2.12;
+
+    double targetEncoderUnits = target * encoderPulsesPerRevolution * revolutionsPerMeter;
+    this->pMasterTalonSRX->Set(ControlMode::MotionMagic, targetEncoderUnits);
 }
 
 void AdvancedDrive::SetYVelocityInvert(bool invertState) {
