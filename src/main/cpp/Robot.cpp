@@ -5,6 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+/**
+ * Lessons Learned:
+ * 1) Opening curly brace goes on the line BELOW, comments go to the RIGHT, as you write!
+ * 2) Write code from-the-ground-up to match Mechanical.
+ *  They'll want to test systems, create each system (motor/s) as a class,
+ *  make the devices private members
+ *  then write accessors for the motors (or whatever). This will scale MUCH nicer
+ */
+
+
 #include "Robot.h"
 
 #include <iostream>
@@ -115,8 +125,6 @@ void Robot::TeleopPeriodic() {
    */
   this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
   this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
-
-
 
 }
 
