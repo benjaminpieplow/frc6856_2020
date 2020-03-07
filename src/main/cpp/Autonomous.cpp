@@ -118,7 +118,7 @@ void CrudeAuton::RunStage01(Shooter* pShooter, Elevator* pElevator) {
             pElevator->FeederForward();
         }
     //If this stage has run its course
-    } else if (this->mStageTimer.HasPeriodPassed(5)) {
+    } else if (this->mStageTimer.HasPeriodPassed(4)) {
         //Clear the timer for the next use
         this->mStageTimer.Reset();
         //Clear the Stage flag for the next guy
@@ -157,7 +157,7 @@ void CrudeAuton::RunStage02(AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDriv
         //Mark stage as started
         this->mStageStarted = true;
     } else {
-        pLeftDrive->SetTargetMotionProfileTarget(2);
-        pRightDrive->SetTargetMotionProfileTarget(2);
+        pLeftDrive->SetTargetMotionProfileTarget(-2);
+        pRightDrive->SetTargetMotionProfileTarget(-2);
     }
 }
