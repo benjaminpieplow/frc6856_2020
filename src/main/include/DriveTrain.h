@@ -25,7 +25,7 @@ class TankDrive {
 
 class AdvancedDrive {
     public:
-    AdvancedDrive(int masterCANID, int slaveCANID);
+    AdvancedDrive(int masterCANID, int slaveCANID, bool inverted);
     ~AdvancedDrive();
     
     //Set Talons to be basic (ramped) PWM controllers
@@ -56,6 +56,8 @@ class AdvancedDrive {
     void VelocityTank(double joyX, double joyY, double joyBoost);
 
     void SetTargetMotionProfileTarget(double target);
+
+    void ZeroEncoder();
 
     private:
     WPI_TalonSRX* pMasterTalonSRX;

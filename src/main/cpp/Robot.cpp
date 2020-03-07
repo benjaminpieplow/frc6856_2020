@@ -34,8 +34,8 @@ void Robot::RobotInit() {
   this->m_pPrimaryController = new ControllerInput(0);
   this->m_pSecondaryController = new ControllerInput(1);
 
-  this->m_pLeftTrack = new AdvancedDrive(10, 11);
-  this->m_pRightTrack = new AdvancedDrive(12, 13);
+  this->m_pLeftTrack = new AdvancedDrive(10, 11, true);
+  this->m_pRightTrack = new AdvancedDrive(12, 13, false);
 
   //Shooter Falcon
   this->m_pTestShooter = new Shooter(40, 16);
@@ -52,6 +52,8 @@ void Robot::RobotInit() {
   //Intake System
   this->m_pIntakeSystem = new Intake(27);
 
+  this->m_pAuton = new Autonomous(this->m_pTestTurret, this->m_pTestShooter, this->m_pLeftTrack, this->m_pRightTrack, this->m_pElevator);
+
   //Init PIDs for Drivetrain
   this->m_pLeftTrack->InitVelocityControl();
   this->m_pRightTrack->InitVelocityControl();
@@ -59,8 +61,7 @@ void Robot::RobotInit() {
   this->m_pLeftTrack->VelocityTank(0,0);
   this->m_pRightTrack->VelocityTank(0,0);
 
-  //Set left track to invert Y
-  this->m_pLeftTrack->SetYVelocityInvert(true);
+//  this->m_pLeftTrack->SetYVelocityInvert(true);
 
 
     frc::SmartDashboard::PutBoolean("DB/LED 0", false);
@@ -91,6 +92,8 @@ void Robot::RobotPeriodic() {}
  * make sure to add them to the chooser code above as well.
  */
 void Robot::AutonomousInit() {
+  /**
+   * Original Auton
   m_autoSelected = m_chooser.GetSelected();
   // m_autoSelected = SmartDashboard::GetString("Auto Selector",
   //     kAutoNameDefault);
@@ -99,11 +102,16 @@ void Robot::AutonomousInit() {
   if (m_autoSelected == kAutoNameCustom) {
     // Custom Auto goes here
       } else {
-    // Default Auto goes here
   }
+  */
+  this->m_pAuton->CrudeAutonInit();
 }
 
-void Robot::AutonomousPeriodic() {  
+void Robot::AutonomousPeriodic() {
+  frc::SmartDashboard::PutBoolean("DB/LED 0", false);
+  frc::SmartDashboard::PutBoolean("DB/LED 1", false);
+  frc::SmartDashboard::PutBoolean("DB/LED 2", false);
+  this->m_pAuton->CrudeAutonPeriodic();
 }
 
 void Robot::TeleopInit() {}
@@ -123,7 +131,7 @@ void Robot::TeleopPeriodic() {
    * Currently, either the integral accumulator or (more likely) a combination of Boost and maximum velocity not being reached
    * prevents the robot from decelerating on demand. Fix this when you have a working drive base.
    */
-  this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
+  this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
   this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
 
 }

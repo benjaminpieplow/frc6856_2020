@@ -14,6 +14,25 @@
 
 #include <frc/Timer.h>
 
+#include <frc/smartdashboard/SmartDashboard.h>
+
+class CrudeAuton
+{
+public:
+    CrudeAuton();
+    ~CrudeAuton();
+
+    int GetStage();
+    void ResetCrudeAuton();
+    void RunStage00(Shooter* pShooter);
+    void RunStage01(Shooter* pShooter, Elevator* pElevator);
+    void RunStage02(AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive);
+private:
+    frc::Timer mStageTimer;
+    bool mStageStarted = false; //Latch, set true when starting a stage
+    int mProgramStage = 0;
+};
+
 class Autonomous
 {
 public:
@@ -43,18 +62,4 @@ private:
     CrudeAuton* m_pCrudeAuton;
 };
 
-class CrudeAuton
-{
-public:
-    CrudeAuton();
-    ~CrudeAuton();
 
-    int GetStage();
-    void RunStage00(Shooter* pShooter);
-    void RunStage01(Shooter* pShooter, Elevator* pElevator);
-    void RunStage02(AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive);
-private:
-    frc::Timer mStageTimer;
-    bool mStageStarted = false; //Latch, set true when starting a stage
-    int mProgramStage = 0;
-};

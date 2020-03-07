@@ -44,7 +44,7 @@ void TankDrive::setTankDrivePower(double forwardSpeed, double turnSpeed)
 
 
 
-AdvancedDrive::AdvancedDrive(int masterCANID, int slaveCANID) {
+AdvancedDrive::AdvancedDrive(int masterCANID, int slaveCANID, bool inverted) {
     this->pMasterTalonSRX = new WPI_TalonSRX(masterCANID);
     this->pSlaveTalonSRX = new WPI_TalonSRX(slaveCANID);
 
@@ -55,6 +55,11 @@ AdvancedDrive::AdvancedDrive(int masterCANID, int slaveCANID) {
     this->pSlaveTalonSRX->ConfigVoltageCompSaturation(10,10);
 
     this->pSlaveTalonSRX->Follow(*this->pMasterTalonSRX);
+
+    if (inverted) {
+        this->pMasterTalonSRX->SetInverted(true);
+        this->pSlaveTalonSRX->SetInverted(true);
+    }
 }
 
 void AdvancedDrive::InitSimpleRampedControl() {
@@ -198,7 +203,6 @@ void AdvancedDrive::InitVelocityControl() {
     this->pMasterTalonSRX->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
     //this->pTalonSRX->ConfigSelectedFeedbackCoefficient();
     this->pMasterTalonSRX->SetSensorPhase(true);
-    this->pMasterTalonSRX->SetInverted(false);
     this->pMasterTalonSRX->SetStatusFramePeriod(StatusFrameEnhanced::Status_13_Base_PIDF0, 10, 10);
     this->pMasterTalonSRX->SetStatusFramePeriod(StatusFrameEnhanced::Status_10_MotionMagic, 10, 10);
 
@@ -236,4 +240,8 @@ void AdvancedDrive::SetTargetMotionProfileTarget(double target) {
 
 void AdvancedDrive::SetYVelocityInvert(bool invertState) {
     this->mReverseYVel = invertState;
+}
+
+void AdvancedDrive::ZeroEncoder() {
+    this->pMasterTalonSRX->SetSelectedSensorPosition(0, 0);
 }

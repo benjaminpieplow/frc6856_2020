@@ -4,6 +4,12 @@
 
 #include <Autonomous.h>
 
+/**
+ * All robot functions are accessed via pointers, pointers are passed to the Autonomous system during object creation
+ * This also creates sub-auton systems, such as auton routines.
+ * All auton routines will have objects created, and must be coded to exit cleanly. In the future, we should only create the auton routine we plan to use,
+ * but this is being realized the week before competition so it's not getting done in 2020.
+ */
 Autonomous::Autonomous(Turret* pTurret, Shooter* pShooter, AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive, Elevator* pElevator)
 {
     //Assign pointers to private objects
@@ -12,13 +18,19 @@ Autonomous::Autonomous(Turret* pTurret, Shooter* pShooter, AdvancedDrive* pLeftD
     this->m_pLeftDrive = pLeftDrive;
     this->m_pRightDrive = pRightDrive;
     this->m_pElevator = pElevator;
+
+    //Do this ONCE
+    this->m_pCrudeAuton = new CrudeAuton();
 }
 
 Autonomous::~Autonomous() {
 }
 
+/**
+ * Setup Crude Auton - Fire and Move
+ */
 void Autonomous::CrudeAutonInit() {
-    this->m_pCrudeAuton = new CrudeAuton();
+    this->m_pCrudeAuton->ResetCrudeAuton();
 }
 
 /**
@@ -34,14 +46,17 @@ void Autonomous::CrudeAutonPeriodic() {
     {
     case 0:
         this->m_pCrudeAuton->RunStage00(this->m_pShooter);
+        frc::SmartDashboard::PutBoolean("DB/LED 1", true);
         break;
     
     case 1:
         this->m_pCrudeAuton->RunStage01(this->m_pShooter, this->m_pElevator);
+        frc::SmartDashboard::PutBoolean("DB/LED 2", true);
         break;
     
     case 2:
         this->m_pCrudeAuton->RunStage02(this->m_pLeftDrive, this->m_pRightDrive);
+        frc::SmartDashboard::PutBoolean("DB/LED 3", true);
         break;
     
     default:
@@ -64,6 +79,13 @@ int CrudeAuton::GetStage() {
     return this->mProgramStage;
 }
 
+/**
+ * Resets counters and flags pertaining to stage tracking
+ */
+void CrudeAuton::ResetCrudeAuton() {
+    this->mProgramStage = 0;
+    this->mStageStarted = false;
+}
 
 /**
  * Uses AutoRPM to check if the shooter is at-speed.
@@ -71,6 +93,7 @@ int CrudeAuton::GetStage() {
  */
 void CrudeAuton::RunStage00(Shooter* pShooter) {
     if (pShooter->AutoRPM()) {
+//    if (true) {
         this->mProgramStage = 1;
     }
 }
@@ -112,6 +135,7 @@ void CrudeAuton::RunStage01(Shooter* pShooter, Elevator* pElevator) {
         pElevator->ElevatorForward();
         //If at RPM, put balls in shooter
         if (pShooter->AutoRPM()) {
+//        if (true) {
             pElevator->FeederForward();
         //If not at RPM, no balls for shooter
         } else {
@@ -124,6 +148,16 @@ void CrudeAuton::RunStage01(Shooter* pShooter, Elevator* pElevator) {
  * Final stage of CrudeAuton, use Motion Profiles to run 1 meter
  */
 void CrudeAuton::RunStage02(AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive) {
-    pLeftDrive->SetTargetMotionProfileTarget(1);
-    pRightDrive->SetTargetMotionProfileTarget(1);
+    if (!this->mStageStarted) {
+        //Zero Encoders and reset drivetrain
+        pLeftDrive->ZeroEncoder();
+        pRightDrive->ZeroEncoder();
+        pLeftDrive->SetTargetMotionProfileTarget(0);
+        pRightDrive->SetTargetMotionProfileTarget(0);
+        //Mark stage as started
+        this->mStageStarted = true;
+    } else {
+        pLeftDrive->SetTargetMotionProfileTarget(2);
+        pRightDrive->SetTargetMotionProfileTarget(2);
+    }
 }

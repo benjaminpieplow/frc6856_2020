@@ -21,6 +21,8 @@
 #include <Turret.h>
 #include <Intake.h>
 
+#include <Autonomous.h>
+
 #include <BallSystem.h>
 
 //Maybe we can move this somewhere else?
@@ -62,4 +64,6 @@ class Robot : public frc::TimedRobot {
   BallSystem* m_pBallSystem;
 
   Intake* m_pIntakeSystem;
+
+  Autonomous* m_pAuton;
 };
