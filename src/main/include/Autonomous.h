@@ -62,24 +62,3 @@ private:
     CrudeAuton* m_pCrudeAuton;
 };
 
-
-class DemoClass
-{
-private:
-    int myInt = 5;
-    int objInt;
-public:
-    DemoClass(int objNum);
-    ~DemoClass();
-};
-
-DemoClass::DemoClass(int objNum)
-{
-    this->objInt = objNum;
-}
-
-DemoClass::~DemoClass()
-{
-}
-
-

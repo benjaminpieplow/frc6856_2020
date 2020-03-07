@@ -50,7 +50,10 @@ void Robot::RobotInit() {
   this->m_pBallSystem = new BallSystem(this->m_pElevator, this->m_pTestShooter, m_pTestTurret);
 
   //Intake System
-  this->m_pIntakeSystem = new Intake(27);
+  this->m_pIntakeSystem = new Intake(29);
+
+  //Climber
+  this->m_pLiftSystem = new LiftSystem(27);
 
   this->m_pAuton = new Autonomous(this->m_pTestTurret, this->m_pTestShooter, this->m_pLeftTrack, this->m_pRightTrack, this->m_pElevator);
 
@@ -165,6 +168,14 @@ void Robot::TestPeriodic() {
     this->m_pElevator->FeederForward();
   } else {
     this->m_pElevator->FeederStop();
+  }
+
+  if (this->m_pPrimaryController->getRawButton(3)) {
+    this->m_pLiftSystem->LiftRaise();
+  } else if (this->m_pPrimaryController->getRawButton(4)) {
+    this->m_pLiftSystem->LiftClimb();
+  } else {
+    this->m_pLiftSystem->LiftStop();
   }
 
 //    frc::SmartDashboard::PutBoolean("DB/LED 3", false);
