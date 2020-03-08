@@ -73,8 +73,8 @@ double Shooter::GetShooterRPM() {
  * Inverts pixel from SmartDashboard because OpenCV is hot garbage
  */
 double Shooter::GetRawYPixel() {
-    //Needs special treatment because OpenCV sends distance from the top
     double visionTargetYLowPos = frc::SmartDashboard::GetNumber("visionTargetYLowPos", -1);
+    //Needs special treatment because OpenCV sends distance from the top
     if (visionTargetYLowPos > 0) {
     //If we have accurate data
         return (this->mCameraYRes - visionTargetYLowPos);
@@ -122,6 +122,7 @@ double Shooter::GetTargetDistance() {
     //Calculate distance
     double targetDistance = this->mTargetCameraElevation / tan(targetRadians);
 
+
     return targetDistance;
 }
 
@@ -130,7 +131,9 @@ double Shooter::GetTargetDistance() {
  * TODO: Use the right number
  */
 double Shooter::GetTargetCalculatedRPM() {
-    return this->GetTargetDistance() * 500;
+    double targetDistance = this->GetTargetDistance();
+    double calculatedRPM = 206.5 * (pow(targetDistance, 2.0)) - 772.4 * targetDistance + 4585.4;
+    return calculatedRPM;
 }
 
 
@@ -175,4 +178,21 @@ bool Shooter::AutoRPM() {
         this->DisableShooter();
         return false;
     }
+}
+
+void Shooter::ToggleAutoRPM(bool enableButton, bool disableButton) {
+    if (enableButton) {
+        this->mAutoRPMEnabled = true;
+    }
+    if (disableButton) {
+        this->mAutoRPMEnabled = false;
+    }
+    if (this->mAutoRPMEnabled) {
+        this->AutoRPM();
+    }
+    else
+    {
+        this->DisableShooter();
+    }
+    
 }

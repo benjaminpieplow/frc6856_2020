@@ -32,11 +32,11 @@ private:
 
 
     //SmartIntake Current Threshold (amps)
-    const double mSmartIntakeCurrentThreshold = 40;
+    const double mSmartIntakeCurrentThreshold = 20;
     //SmartIntake Trigger Time
-    const double mSmartIntakeTriggerTime = 1;
+    const double mSmartIntakeTriggerTime = 2;
     //SmartIntake BackOff Time
-    const double mSmartIntakeBackOffTime = 0.75;
+    const double mSmartIntakeBackOffTime = 2;
     //SmartIntake BackOff Latch
     bool mSmartIntakeLatch = false;
 
@@ -57,7 +57,7 @@ private:
 
 
     
-    const double mElevatorForwardPower = 0.5;
+    const double mElevatorForwardPower = 0.75;
     const double mElevatorReversePower = -0.5;
     
 };

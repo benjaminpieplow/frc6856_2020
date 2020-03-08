@@ -139,20 +139,13 @@ void Robot::TeleopPeriodic() {
    * prevents the robot from decelerating on demand. Fix this when you have a working drive base.
    */
 
+  this->m_pTestShooter->ToggleAutoRPM(this->m_pPrimaryController->getRawButton(6), this->m_pPrimaryController->getRawButton(5));
 
-  double currentRPM = m_pTestShooter->GetShooterRPM();
-  double newRPM = currentRPM + 10 * this->m_pPrimaryController->getJoyY() * -1;
-  frc::SmartDashboard::PutNumber("DB/Slider 0", newRPM / 1000);
-
-  if (this->m_pPrimaryController->getRawButton(6)) {
-      this->m_pTestShooter->EnableShooter(newRPM);
-  } else {
-    //Disable BOOST for newbie drivers
+  //Disable BOOST for new drivers
 //      this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
 //      this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
-      this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), 0);
-      this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), 0);
-  }
+    this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), 0);
+    this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), 0);
 
   if (this->m_pPrimaryController->getRawButton(5)) {
     this->m_pTestShooter->DisableShooter();
@@ -169,7 +162,7 @@ void Robot::TeleopPeriodic() {
 
   if (this->m_pPrimaryController->getRTrigger() > 0.25)
   {
-    this->m_pElevator->SmartIntake();
+    this->m_pElevator->ElevatorForward();
   }
   else if (this->m_pPrimaryController->getLTrigger() > 0.25)
   {
@@ -200,24 +193,24 @@ void Robot::TestPeriodic() {
 
   double currentRPM = m_pTestShooter->GetShooterRPM();
   double newRPM = currentRPM + 10 * this->m_pPrimaryController->getJoyY() * -1;
-  frc::SmartDashboard::PutNumber("DB/Slider 0", newRPM / 1000);
+  frc::SmartDashboard::PutNumber("DB/Slider 1", newRPM / 1000);
+  frc::SmartDashboard::PutNumber("DB/Slider 2", this->m_pTestShooter->GetTargetDistance());
+  frc::SmartDashboard::PutNumber("DB/Slider 3", this->m_pTestShooter->GetTargetCalculatedRPM());
 
- if (this->m_pPrimaryController->getRawButton(6)) {
-     this->m_pTestShooter->EnableShooter(newRPM);
- }
- if (this->m_pPrimaryController->getRawButton(5)) {
-   this->m_pTestShooter->DisableShooter();
- }
+
+  this->m_pTestShooter->ToggleAutoRPM(this->m_pPrimaryController->getRawButton(6), this->m_pPrimaryController->getRawButton(5));
 
     frc::SmartDashboard::PutBoolean("DB/LED 0", false);
     frc::SmartDashboard::PutBoolean("DB/LED 1", false);
     frc::SmartDashboard::PutBoolean("DB/LED 2", false);
 
-
-  this->m_pLiftSystem->LiftSystemPower(this->m_pPrimaryController->getJoyY());
-
-
-
+  if (this->m_pPrimaryController->getRawButton(3)) {
+    this->m_pFeeder->FeedForward();
+    this->m_pElevator->ElevatorForward();
+  } else {
+    this->m_pFeeder->FeedStop();
+    this->m_pElevator->ElevatorStop();
+  }
 //    frc::SmartDashboard::PutBoolean("DB/LED 3", false);
 
 /**

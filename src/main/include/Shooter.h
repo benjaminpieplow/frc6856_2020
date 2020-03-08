@@ -57,10 +57,15 @@ class Shooter {
     //Spins shooter to setpoint RPM, fires when ready
     bool AutoRPM();
 
+    void ToggleAutoRPM(bool enableButton, bool disableButton);
+
 
     private:
     //Target RPM
     double mShooterTargetRPM = 100;
+
+    //Shooter Latch for ToggleAutoRPM
+    bool mAutoRPMEnabled = false;
 
     //Sample Rate Multiplier
     const double mSampleRateModifier = 10;
@@ -70,6 +75,8 @@ class Shooter {
 
     //How many encoder ticks map to one revolution of the accelerator shaft
     const int encoderUnitsPerRevolution = 2048;
+
+
 
     //Camera Resolution
     const double mCameraXRes = 640;

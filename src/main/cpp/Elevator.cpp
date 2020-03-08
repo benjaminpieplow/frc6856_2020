@@ -62,11 +62,11 @@ void Elevator::SmartIntake() {
         if (this->m_pElevatorMotor->GetStatorCurrent() > this->mSmartIntakeCurrentThreshold)
         {   //We are over-current
             this->mSmartIntakeTimer.Start();  //Start counting over-current seconds
-            this->ElevatorReverse();        //Reverse Elevator
         }
         else
         {   //We are not over-current
             this->mSmartIntakeTimer.Reset();  //Reset the timer
+            this->mSmartIntakeTimer.Stop();
             this->ElevatorForward();        //Continue to run
         }
 
@@ -74,6 +74,7 @@ void Elevator::SmartIntake() {
         {   //If we have exceeded the current grace period
             this->mSmartIntakeLatch = true;   //Latch into reverse
             this->mSmartIntakeTimer.Reset();  //Reset timer for reverse stage
+            this->mSmartIntakeTimer.Start();
             this->ElevatorReverse();        //Reverse the intake
         }
     }
@@ -82,6 +83,7 @@ void Elevator::SmartIntake() {
         if (this->mSmartIntakeTimer.HasPeriodPassed(this->mSmartIntakeBackOffTime))
         {   //And it is done tripping
             this->mSmartIntakeTimer.Reset();  //Reset timer for normal stage
+            this->mSmartIntakeTimer.Stop();
             this->ElevatorForward();        //Run forward
             this->mSmartIntakeLatch = false;  //Reset latch
         } else
