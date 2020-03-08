@@ -16,15 +16,9 @@ void BallSystem::StartIntake() {
     //TODO:
 }
 
-void BallSystem::Volley() {
+void BallSystem::AutoVolley() {
 
     if (this->m_pTurret->GetTurretLocked()) {
         //Fire when ready!
-    }
-
-    this->m_pShooter->EnableShooter();
-
-    if (this->m_pShooter->ShooterReady()) {
-        this->m_pElevator->ElevatorForward();
     }
 }

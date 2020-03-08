@@ -7,11 +7,11 @@
 #include <Elevator.h>
 
 
-Elevator::Elevator(int elevatorCANID, int feederCANID)
+Elevator::Elevator(int CANID)
 {
-    this->m_pElevatorMotor = new WPI_TalonSRX(elevatorCANID);
-    this->m_pFeederMotor = new WPI_TalonSRX(feederCANID);
+    this->m_pElevatorMotor = new WPI_TalonSRX(CANID);
 
+    this->m_pElevatorMotor->SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode::Brake);
     this->m_pElevatorMotor->SetInverted(true);
 }
 
@@ -21,28 +21,13 @@ Elevator::~Elevator()
 
 
 void Elevator::ElevatorForward() {
-    this->m_pElevatorMotor->Set(ControlMode::PercentOutput, this->forwardPower);
+    this->m_pElevatorMotor->Set(ControlMode::PercentOutput, this->mElevatorForwardPower);
 }
 void Elevator::ElevatorReverse() {
-    this->m_pElevatorMotor->Set(ControlMode::PercentOutput, -1);
+    this->m_pElevatorMotor->Set(ControlMode::PercentOutput, this->mElevatorReversePower);
 }
 void Elevator::ElevatorStop() {
     this->m_pElevatorMotor->Set(ControlMode::PercentOutput, 0);
-}
-
-void Elevator::FeederForward() {
-    this->m_pFeederMotor->Set(ControlMode::PercentOutput, 1);
-}
-void Elevator::FeederReverse() {
-    this->m_pFeederMotor->Set(ControlMode::PercentOutput, -1);
-}
-void Elevator::FeederStop() {
-    this->m_pFeederMotor->Set(ControlMode::PercentOutput, 0);
-}
-
-void Elevator::Stop() {
-    this->m_pElevatorMotor->Set(ControlMode::PercentOutput, 0);
-    this->m_pFeederMotor->Set(ControlMode::PercentOutput, 0);
 }
 
 void Elevator::SetElevatorPower(double power) {

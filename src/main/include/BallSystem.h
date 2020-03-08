@@ -15,7 +15,7 @@ public:
 
     void StartIntake();
 
-    void Volley();
+    void AutoVolley();
     
 private:
 

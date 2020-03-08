@@ -21,6 +21,7 @@
 #include <Turret.h>
 #include <IntakeArm.h>
 #include <LiftSystem.h>
+#include <Feeder.h>
 
 #include <Autonomous.h>
 
@@ -69,4 +70,6 @@ class Robot : public frc::TimedRobot {
   Autonomous* m_pAuton;
 
   LiftSystem* m_pLiftSystem;
+
+  Feeder* m_pFeeder;
 };

@@ -10,7 +10,7 @@
  * All auton routines will have objects created, and must be coded to exit cleanly. In the future, we should only create the auton routine we plan to use,
  * but this is being realized the week before competition so it's not getting done in 2020.
  */
-Autonomous::Autonomous(Turret* pTurret, Shooter* pShooter, AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive, Elevator* pElevator)
+Autonomous::Autonomous(Turret* pTurret, Shooter* pShooter, AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive, Elevator* pElevator, Feeder* pFeeder)
 {
     //Assign pointers to private objects
     this->m_pTurret = pTurret;
@@ -18,6 +18,7 @@ Autonomous::Autonomous(Turret* pTurret, Shooter* pShooter, AdvancedDrive* pLeftD
     this->m_pLeftDrive = pLeftDrive;
     this->m_pRightDrive = pRightDrive;
     this->m_pElevator = pElevator;
+    this->m_pFeeder = pFeeder;
 
     //Do this ONCE
     this->m_pCrudeAuton = new CrudeAuton();
@@ -50,7 +51,7 @@ void Autonomous::CrudeAutonPeriodic() {
         break;
     
     case 1:
-        this->m_pCrudeAuton->RunStage01(this->m_pShooter, this->m_pElevator);
+        this->m_pCrudeAuton->RunStage01(this->m_pShooter, this->m_pElevator, m_pFeeder);
         frc::SmartDashboard::PutBoolean("DB/LED 2", true);
         break;
     
@@ -102,8 +103,9 @@ void CrudeAuton::RunStage00(Shooter* pShooter) {
  * Pushes balls through the intake for 5 seconds
  * Only runns the feed when the shooter is at speed
  * Holds (and verifies) shooter speed using Shooter's AutoRPM
+ * TODO: If elevator jams, move elevatorfeed inside AutoRPM
  */
-void CrudeAuton::RunStage01(Shooter* pShooter, Elevator* pElevator) {
+void CrudeAuton::RunStage01(Shooter* pShooter, Elevator* pElevator, Feeder* pFeeder) {
     //If this is the first run
     if (!this->mStageStarted) {
         //Clear and start the timer
@@ -115,7 +117,7 @@ void CrudeAuton::RunStage01(Shooter* pShooter, Elevator* pElevator) {
         pElevator->ElevatorForward();
         //If shooter is ready, give it balls
         if (pShooter->AutoRPM()) {
-            pElevator->FeederForward();
+            pFeeder->FeedForward();
         }
     //If this stage has run its course
     } else if (this->mStageTimer.HasPeriodPassed(4)) {
@@ -127,7 +129,8 @@ void CrudeAuton::RunStage01(Shooter* pShooter, Elevator* pElevator) {
         this->mProgramStage = 2;
 
         //Shut down involved mechanisms
-        pElevator->Stop();
+        pElevator->ElevatorStop();
+        pFeeder->FeedStop();
         pShooter->DisableShooter();
     //If 'cruising' in stage
     } else {
@@ -136,10 +139,10 @@ void CrudeAuton::RunStage01(Shooter* pShooter, Elevator* pElevator) {
         //If at RPM, put balls in shooter
         if (pShooter->AutoRPM()) {
 //        if (true) {
-            pElevator->FeederForward();
+            pFeeder->FeedForward();
         //If not at RPM, no balls for shooter
         } else {
-            pElevator->Stop();
+            pFeeder->FeedStop();
         }
     }
 }

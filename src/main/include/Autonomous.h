@@ -11,6 +11,7 @@
 #include <DriveTrain.h>
 #include <Turret.h>
 #include <Elevator.h>
+#include <Feeder.h>
 
 #include <frc/Timer.h>
 
@@ -25,7 +26,7 @@ public:
     int GetStage();
     void ResetCrudeAuton();
     void RunStage00(Shooter* pShooter);
-    void RunStage01(Shooter* pShooter, Elevator* pElevator);
+    void RunStage01(Shooter* pShooter, Elevator* pElevator, Feeder* pFeeder);
     void RunStage02(AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive);
 private:
     frc::Timer mStageTimer;
@@ -36,7 +37,7 @@ private:
 class Autonomous
 {
 public:
-    Autonomous(Turret* pTurret, Shooter* pShooter, AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive, Elevator* pElevator);
+    Autonomous(Turret* pTurret, Shooter* pShooter, AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive, Elevator* pElevator, Feeder* pFeeder);
     ~Autonomous();
 
     /**
@@ -57,6 +58,7 @@ private:
     AdvancedDrive* m_pLeftDrive;
     AdvancedDrive* m_pRightDrive;
     Elevator* m_pElevator;
+    Feeder* m_pFeeder;
 
     //Pointers to Auton Systems
     CrudeAuton* m_pCrudeAuton;

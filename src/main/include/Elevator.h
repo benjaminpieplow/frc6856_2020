@@ -1,6 +1,5 @@
 /**
  * Moves balls from intake to turret feed
- * Includes code to push ball into shooter
  */
 #pragma once
 
@@ -9,7 +8,7 @@
 class Elevator {
 
 public:
-    Elevator(int elevatorCANID, int feederCANID);
+    Elevator(int CANID);
     ~Elevator();
 
     //Elevator
@@ -17,26 +16,14 @@ public:
     void ElevatorReverse();
     void ElevatorStop();
 
-    //Feeder
-    void FeederForward();
-    void FeederReverse();
-    void FeederStop();
-
-    //Shared
-    void Stop();
-
     //Testing
     void SetElevatorPower(double power);
-
-
 
 private:
     //Elevator Motor
     WPI_TalonSRX* m_pElevatorMotor;
     
-    //Feeder Motor
-    WPI_TalonSRX* m_pFeederMotor;
-
-    double forwardPower = 1;
+    const double mElevatorForwardPower = 1;
+    const double mElevatorReversePower = -1;
     
 };

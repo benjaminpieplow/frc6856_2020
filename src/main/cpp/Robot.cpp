@@ -44,7 +44,10 @@ void Robot::RobotInit() {
   this->m_pTestTurret = new Turret(26);
 
   //Elevintake System
-  this->m_pElevator = new Elevator(24, 17);
+  this->m_pElevator = new Elevator(24);
+
+  //Ball Feeder System
+  this->m_pFeeder = new Feeder(17);
 
   //Master Ball System
   this->m_pBallSystem = new BallSystem(this->m_pElevator, this->m_pTestShooter, m_pTestTurret);
@@ -56,7 +59,7 @@ void Robot::RobotInit() {
   this->m_pLiftSystem = new LiftSystem(27);
 
   //Autonomous system - controls robot during Autonomous
-  this->m_pAuton = new Autonomous(this->m_pTestTurret, this->m_pTestShooter, this->m_pLeftTrack, this->m_pRightTrack, this->m_pElevator);
+  this->m_pAuton = new Autonomous(this->m_pTestTurret, this->m_pTestShooter, this->m_pLeftTrack, this->m_pRightTrack, this->m_pElevator, m_pFeeder);
 
   //Init PIDs for Drivetrain
   this->m_pLeftTrack->InitVelocityControl();
@@ -166,9 +169,9 @@ void Robot::TestPeriodic() {
     this->m_pIntakeArm->SetIntakePower(0);
   }
   if (this->m_pPrimaryController->getRawButton(2)) {
-    this->m_pElevator->FeederForward();
+    this->m_pFeeder->FeedForward();
   } else {
-    this->m_pElevator->FeederStop();
+    this->m_pFeeder->FeedStop();
   }
 
   if (this->m_pPrimaryController->getRawButton(3)) {
