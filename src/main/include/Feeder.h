@@ -12,11 +12,13 @@ public:
     Feeder(int CANID);
     ~Feeder();
 
+    //Move Feeder
     void FeedForward();
     void FeedReverse();
     void FeedStop();
 
-    void SetFeederPower();
+    //Manual Override
+    void SetFeederPower(double power);
 
 private:
     const double mFeedForwardPower = 1;

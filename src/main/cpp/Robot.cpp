@@ -50,7 +50,7 @@ void Robot::RobotInit() {
   this->m_pFeeder = new Feeder(17);
 
   //Master Ball System
-  this->m_pBallSystem = new BallSystem(this->m_pElevator, this->m_pTestShooter, m_pTestTurret);
+  this->m_pBallSystem = new BallSystem(this->m_pElevator, this->m_pTestShooter, this->m_pTestTurret, this->m_pIntakeArm);
 
   //Intake System
   this->m_pIntakeArm = new IntakeArm(24);
@@ -144,29 +144,42 @@ void Robot::TeleopPeriodic() {
   double newRPM = currentRPM + 10 * this->m_pPrimaryController->getJoyY() * -1;
   frc::SmartDashboard::PutNumber("DB/Slider 0", newRPM / 1000);
 
- if (this->m_pPrimaryController->getRawButton(6)) {
-     this->m_pTestShooter->EnableShooter(newRPM);
- } else {
-    this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
-    this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
- }
+  if (this->m_pPrimaryController->getRawButton(6)) {
+      this->m_pTestShooter->EnableShooter(newRPM);
+  } else {
+    //Disable BOOST for newbie drivers
+//      this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
+//      this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
+      this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), 0);
+      this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), 0);
+  }
 
- if (this->m_pPrimaryController->getRawButton(5)) {
-   this->m_pTestShooter->DisableShooter();
- }
+  if (this->m_pPrimaryController->getRawButton(5)) {
+    this->m_pTestShooter->DisableShooter();
+  }
 
   if (this->m_pPrimaryController->getRawButton(3)) {
     this->m_pFeeder->FeedForward();
+    this->m_pElevator->ElevatorForward();
   } else {
     this->m_pFeeder->FeedStop();
-  }
-
-//  this->m_pElevator->SetElevatorPower(this->m_pPrimaryController->getRTrigger() - this->m_pPrimaryController->getLTrigger());
-  if (this->m_pPrimaryController->getRawButton(1)) {
-    this->m_pElevator->SmartFeed();
-  } else {
     this->m_pElevator->ElevatorStop();
   }
+
+
+  if (this->m_pPrimaryController->getRTrigger() > 0.25)
+  {
+    this->m_pElevator->SmartIntake();
+  }
+  else if (this->m_pPrimaryController->getLTrigger() > 0.25)
+  {
+    this->m_pElevator->ElevatorReverse();
+  }
+  else if (!this->m_pPrimaryController->getRawButton(3))
+  {
+    this->m_pElevator->ElevatorStop();
+  }
+
   
 
 /**

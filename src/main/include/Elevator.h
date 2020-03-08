@@ -18,6 +18,9 @@ public:
     void ElevatorStop();
 
     //Feeds forward, if jam detected, reverses for 0.5 seconds
+    void SmartIntake();
+
+    //Reverses for half a second before feeding to turret
     void SmartFeed();
 
     //Testing
@@ -27,17 +30,32 @@ private:
     //Elevator Motor
     WPI_TalonSRX* m_pElevatorMotor;
 
-    //SmartFeed Current Threshold (amps)
-    double mSmartFeedCurrentThreshold = 40;
-    //SmartFeed Trigger Time
-    double mSmartFeedTriggerTime = 1;
-    //SmartFeed BackOff Time
-    double mSmartFeedBackOffTime = 0.75;
-    //SmartFeed BackOff Latch
+
+    //SmartIntake Current Threshold (amps)
+    const double mSmartIntakeCurrentThreshold = 40;
+    //SmartIntake Trigger Time
+    const double mSmartIntakeTriggerTime = 1;
+    //SmartIntake BackOff Time
+    const double mSmartIntakeBackOffTime = 0.75;
+    //SmartIntake BackOff Latch
+    bool mSmartIntakeLatch = false;
+
+    //SmartIntake timer
+    frc::Timer mSmartIntakeTimer;
+
+
+    //SmartFeed Reverse Time
+    const double mSmartFeedReverseTime = 0.5;
+    //SmartFeed Cooldown Time
+    const double mSmartFeedCooldownTime = 2;
+    //SmartFeed Latch
     bool mSmartFeedLatch = false;
 
-    //SmartFeed timer
+    //SmartFeed Timer
     frc::Timer mSmartFeedTimer;
+    
+
+
     
     const double mElevatorForwardPower = 0.5;
     const double mElevatorReversePower = -0.5;

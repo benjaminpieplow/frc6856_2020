@@ -28,3 +28,7 @@ void Feeder::FeedReverse() {
 void Feeder::FeedStop() {
     this->m_pFeederMotor->Set(ControlMode::PercentOutput, 0);
 }
+
+void Feeder::SetFeederPower(double power) {
+    this->m_pFeederMotor->Set(ControlMode::PercentOutput, power);
+}

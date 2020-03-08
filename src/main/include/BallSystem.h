@@ -6,11 +6,12 @@
 #include <Elevator.h>
 #include <Shooter.h>
 #include <Turret.h>
+#include <IntakeArm.h>
 
 class BallSystem
 {
 public:
-    BallSystem(Elevator* pElevatorPointer, Shooter* pShooterPointer, Turret* pTurretPointer);
+    BallSystem(Elevator* pElevatorPointer, Shooter* pShooterPointer, Turret* pTurretPointer, IntakeArm* m_pIntakeArm);
     ~BallSystem();
 
     void StartIntake();
@@ -23,6 +24,7 @@ private:
     Elevator* m_pElevator;
     Shooter* m_pShooter;
     Turret* m_pTurret;
+    IntakeArm* m_pIntakeArm;
 
     double taskStartTime = 0;
 };
