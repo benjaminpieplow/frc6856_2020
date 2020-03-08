@@ -14,7 +14,7 @@ Turret::Turret(int CANID) {
     //Sensor Configuration
     this->m_pTurretServo->ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Relative, 0, 10);
     this->m_pTurretServo->SetSensorPhase(true);     //Invert Input
-    this->m_pTurretServo->SetInverted(false);       //Output is fine
+    this->m_pTurretServo->SetInverted(true);       //Output is fine
 
     //A solid 2 hours of work went into this line because yours truly did not realize it was an overloaded function
     this->m_pTurretServo->ConfigForwardLimitSwitchSource(RemoteLimitSwitchSource::RemoteLimitSwitchSource_RemoteTalonSRX, LimitSwitchNormal_NormallyOpen, 40, 0);
@@ -136,8 +136,8 @@ bool Turret::GetHomed() {
 
 
     /** Actual Homing Code */
-    if (stickies.ReverseLimitSwitch || this->mReverseLimitTripped) {
-    //If at home
+    if (stickies.ReverseLimitSwitch || this->mReverseLimitTripped) 
+    {   //If at home
 
         //Clear flags and record routine position
         this->mForwardLimitTripped = false;
@@ -162,7 +162,9 @@ bool Turret::GetHomed() {
 
         return false;
 
-    } else if (stickies.ForwardLimitSwitch || this->mForwardLimitTripped) {
+    }
+    else if
+    (stickies.ForwardLimitSwitch || this->mForwardLimitTripped) {
     //If far-from-home switch has been hit
         this->SetTurretPower(-0.2);
         this->mForwardLimitTripped = true;

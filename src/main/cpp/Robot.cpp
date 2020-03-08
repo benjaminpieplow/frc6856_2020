@@ -159,7 +159,7 @@ void Robot::TeleopPeriodic() {
     this->m_pElevator->ElevatorStop();
   }
 
-
+  //Crude (read: final) intake code
   if (this->m_pPrimaryController->getRTrigger() > 0.25)
   {
     this->m_pElevator->ElevatorForward();
@@ -172,6 +172,9 @@ void Robot::TeleopPeriodic() {
   {
     this->m_pElevator->ElevatorStop();
   }
+
+
+
 
   
 
@@ -211,6 +214,18 @@ void Robot::TestPeriodic() {
     this->m_pFeeder->FeedStop();
     this->m_pElevator->ElevatorStop();
   }
+
+  //Crude Turret code
+  if (this->m_pPrimaryController->getRawButton(1))
+  {
+    this->m_pTestTurret->AutoTurret();
+  }
+  else
+  {
+    this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX());
+  }
+  
+
 //    frc::SmartDashboard::PutBoolean("DB/LED 3", false);
 
 /**
