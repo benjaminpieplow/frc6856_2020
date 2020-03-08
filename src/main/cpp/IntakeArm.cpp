@@ -3,9 +3,9 @@
  * This simply separates the agile code for the intake arm
  */
 
-#include <Intake.h>
+#include <IntakeArm.h>
 
-Intake::Intake(int armCANID) {
+IntakeArm::IntakeArm(int armCANID) {
     
     this->m_pIntakeMotor = new WPI_TalonSRX(armCANID);
     
@@ -20,7 +20,7 @@ Intake::Intake(int armCANID) {
  * If not, starts one and starts a timer to stop it
  * If so, continues the maneuver
  */
-void Intake::LowerIntake() {
+void IntakeArm::LowerIntake() {
 
     if (this->mRaiseLatch) {
         this->mRaiseLatch = false;
@@ -43,7 +43,7 @@ void Intake::LowerIntake() {
     }
 }
 
-void Intake::RaiseIntake() {
+void IntakeArm::RaiseIntake() {
 
     if (this->mLowerLatch) {
         this->mLowerLatch = false;
@@ -66,11 +66,11 @@ void Intake::RaiseIntake() {
     }
 }
 
-void Intake::HoldIntake() {
+void IntakeArm::HoldIntake() {
     this->m_pIntakeMotor->Set(ControlMode::PercentOutput, this->mIntakeHoldPower);
 }
 
-void Intake::IntakePeriodic() {
+void IntakeArm::IntakePeriodic() {
     if (this->mLowerLatch) {
         this->LowerIntake();
     } else if (this->mRaiseLatch) {
@@ -83,6 +83,6 @@ void Intake::IntakePeriodic() {
 /**
  * Set intake power manually
  */
-void Intake::SetIntakePower(double power) {
+void IntakeArm::SetIntakePower(double power) {
     this->m_pIntakeMotor->Set(ControlMode::PercentOutput, power);
 }

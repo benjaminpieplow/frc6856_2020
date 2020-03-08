@@ -11,10 +11,10 @@
 #include <ctre/Phoenix.h>
 #include <frc/Timer.h>
 
-class Intake {
+class IntakeArm {
     public:
-    Intake(int armCANID);
-    ~Intake();
+    IntakeArm(int armCANID);
+    ~IntakeArm();
 
     //Actuation Actions
     void RaiseIntake();

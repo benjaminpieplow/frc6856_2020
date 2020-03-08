@@ -50,11 +50,12 @@ void Robot::RobotInit() {
   this->m_pBallSystem = new BallSystem(this->m_pElevator, this->m_pTestShooter, m_pTestTurret);
 
   //Intake System
-  this->m_pIntakeSystem = new Intake(29);
+  this->m_pIntakeArm = new IntakeArm(29);
 
   //Climber
   this->m_pLiftSystem = new LiftSystem(27);
 
+  //Autonomous system - controls robot during Autonomous
   this->m_pAuton = new Autonomous(this->m_pTestTurret, this->m_pTestShooter, this->m_pLeftTrack, this->m_pRightTrack, this->m_pElevator);
 
   //Init PIDs for Drivetrain
@@ -160,9 +161,9 @@ void Robot::TestPeriodic() {
 
 
   if (this->m_pPrimaryController->getRawButton(1)) {
-    this->m_pIntakeSystem->SetIntakePower(this->m_pPrimaryController->getJoyY());
+    this->m_pIntakeArm->SetIntakePower(this->m_pPrimaryController->getJoyY());
   } else {
-    this->m_pIntakeSystem->SetIntakePower(0);
+    this->m_pIntakeArm->SetIntakePower(0);
   }
   if (this->m_pPrimaryController->getRawButton(2)) {
     this->m_pElevator->FeederForward();
