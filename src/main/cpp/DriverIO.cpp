@@ -41,3 +41,7 @@ void ControllerInput::setRightRumble(double power) {
 double ControllerInput::getRTrigger() {
     return this->m_pController->GetRawAxis(3);
 }
+
+double ControllerInput::getLTrigger() {
+    return this->m_pController->GetRawAxis(2);
+}

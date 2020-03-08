@@ -1,11 +1,9 @@
 
 #include <Shooter.h>
 
-Shooter::Shooter(int ShooterCANID, int FeedCANID) {
+Shooter::Shooter(int CANID) {
 
-    m_pShooterMotor = new WPI_TalonFX(ShooterCANID);
-
-    m_pFeedMotor = new WPI_TalonSRX(FeedCANID);
+    m_pShooterMotor = new WPI_TalonFX(CANID);
 
     this->m_pShooterMotor->ConfigFactoryDefault();
 
@@ -70,10 +68,6 @@ double Shooter::GetShooterRPM() {
     return this->mShooterTargetRPM;
 }
 
-
-void Shooter::FeedPower(double power) {
-    this->m_pFeedMotor->Set(ControlMode::PercentOutput, power);
-}
 
 /**
  * Inverts pixel from SmartDashboard because OpenCV is hot garbage

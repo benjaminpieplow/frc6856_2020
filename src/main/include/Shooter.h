@@ -12,7 +12,7 @@
 
 class Shooter {
     public:
-    Shooter(int ShooterCANID, int FeederCANID);
+    Shooter(int CANID);
     ~Shooter();
 
     //Initiates the turret firing system using the last set RPM
@@ -25,8 +25,6 @@ class Shooter {
 
     //For testing and Development
     void ShooterPower(double power);
-
-    void FeedPower(double power);
 
     //Returns the number of pixels of the target's lowest pixel from camera bottom
     double GetRawYPixel();

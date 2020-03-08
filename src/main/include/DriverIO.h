@@ -21,6 +21,11 @@ class ControllerInput
     //Returns right trigger
     double getRTrigger();
 
+    //Returns left trigger
+    double getLTrigger();
+
+
+
     //Sets Left Rumble
     void setLeftRumble(double power);
 

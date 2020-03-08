@@ -38,13 +38,13 @@ void Robot::RobotInit() {
   this->m_pRightTrack = new AdvancedDrive(12, 13, false);
 
   //Shooter Falcon
-  this->m_pTestShooter = new Shooter(40, 16);
+  this->m_pTestShooter = new Shooter(40);
 
   //Turret System
-  this->m_pTestTurret = new Turret(26);
+  this->m_pTestTurret = new Turret(16);
 
   //Elevintake System
-  this->m_pElevator = new Elevator(24);
+  this->m_pElevator = new Elevator(26);
 
   //Ball Feeder System
   this->m_pFeeder = new Feeder(17);
@@ -53,7 +53,7 @@ void Robot::RobotInit() {
   this->m_pBallSystem = new BallSystem(this->m_pElevator, this->m_pTestShooter, m_pTestTurret);
 
   //Intake System
-  this->m_pIntakeArm = new IntakeArm(29);
+  this->m_pIntakeArm = new IntakeArm(24);
 
   //Climber
   this->m_pLiftSystem = new LiftSystem(27);
@@ -138,8 +138,46 @@ void Robot::TeleopPeriodic() {
    * Currently, either the integral accumulator or (more likely) a combination of Boost and maximum velocity not being reached
    * prevents the robot from decelerating on demand. Fix this when you have a working drive base.
    */
-  this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
-  this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
+
+
+  double currentRPM = m_pTestShooter->GetShooterRPM();
+  double newRPM = currentRPM + 10 * this->m_pPrimaryController->getJoyY() * -1;
+  frc::SmartDashboard::PutNumber("DB/Slider 0", newRPM / 1000);
+
+ if (this->m_pPrimaryController->getRawButton(6)) {
+     this->m_pTestShooter->EnableShooter(newRPM);
+ } else {
+    this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
+    this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
+ }
+
+ if (this->m_pPrimaryController->getRawButton(5)) {
+   this->m_pTestShooter->DisableShooter();
+ }
+
+  if (this->m_pPrimaryController->getRawButton(3)) {
+    this->m_pFeeder->FeedForward();
+  } else {
+    this->m_pFeeder->FeedStop();
+  }
+
+//  this->m_pElevator->SetElevatorPower(this->m_pPrimaryController->getRTrigger() - this->m_pPrimaryController->getLTrigger());
+  if (this->m_pPrimaryController->getRawButton(1)) {
+    this->m_pElevator->SmartFeed();
+  } else {
+    this->m_pElevator->ElevatorStop();
+  }
+  
+
+/**
+  if (this->m_pPrimaryController->getRawButton(1)) {
+    this->m_pElevator->ElevatorStop();
+  } else if (this->m_pPrimaryController->getRawButton(2)) {
+    this->m_pElevator->ElevatorReverse();
+  } else {
+    this->m_pElevator->ElevatorForward();
+  }
+  */
 
 }
 
@@ -163,24 +201,9 @@ void Robot::TestPeriodic() {
     frc::SmartDashboard::PutBoolean("DB/LED 2", false);
 
 
-  if (this->m_pPrimaryController->getRawButton(1)) {
-    this->m_pIntakeArm->SetIntakePower(this->m_pPrimaryController->getJoyY());
-  } else {
-    this->m_pIntakeArm->SetIntakePower(0);
-  }
-  if (this->m_pPrimaryController->getRawButton(2)) {
-    this->m_pFeeder->FeedForward();
-  } else {
-    this->m_pFeeder->FeedStop();
-  }
+  this->m_pLiftSystem->LiftSystemPower(this->m_pPrimaryController->getJoyY());
 
-  if (this->m_pPrimaryController->getRawButton(3)) {
-    this->m_pLiftSystem->LiftRaise();
-  } else if (this->m_pPrimaryController->getRawButton(4)) {
-    this->m_pLiftSystem->LiftClimb();
-  } else {
-    this->m_pLiftSystem->LiftStop();
-  }
+
 
 //    frc::SmartDashboard::PutBoolean("DB/LED 3", false);
 
