@@ -71,7 +71,7 @@ class Shooter {
     const double mSampleRateModifier = 10;
 
     //Allowed Error when checking speed (Percent)
-    const double mAllowedErrorMargin = 0.1;
+    const double mAllowedErrorMargin = 5;
 
     //How many encoder ticks map to one revolution of the accelerator shaft
     const int encoderUnitsPerRevolution = 2048;

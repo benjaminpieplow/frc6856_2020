@@ -11,6 +11,9 @@ Turret::Turret(int CANID) {
     //Problems? Forget about them.
     this->m_pTurretServo->ClearStickyFaults();
 
+    this->m_pTurretServo->ConfigVoltageCompSaturation(10, 10);
+    this->m_pTurretServo->EnableVoltageCompensation(true);
+
     //Sensor Configuration
     this->m_pTurretServo->ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Relative, 0, 10);
     this->m_pTurretServo->SetSensorPhase(true);     //Invert Input
@@ -27,8 +30,8 @@ Turret::Turret(int CANID) {
     //Set Maximums and Targets
     this->m_pTurretServo->ConfigNominalOutputForward(0, 10);
     this->m_pTurretServo->ConfigNominalOutputReverse(0, 10);
-    this->m_pTurretServo->ConfigPeakOutputForward(0.35, 10);
-    this->m_pTurretServo->ConfigPeakOutputReverse(-0.35, 10);
+    this->m_pTurretServo->ConfigPeakOutputForward(0.8, 10);
+    this->m_pTurretServo->ConfigPeakOutputReverse(-0.8, 10);
     //Soft Limits
     int forwardSoftLimit = int((this->mHomeFrameOffset + this->mSoftLimitFromCenter) * this->mEncoderTicksPerDegree);
     int reverseSoftLimit = int((this->mHomeFrameOffset - this->mSoftLimitFromCenter) * this->mEncoderTicksPerDegree);
@@ -39,14 +42,18 @@ Turret::Turret(int CANID) {
 
     //Set PIDs
     this->m_pTurretServo->SelectProfileSlot(0, 0);
-    this->m_pTurretServo->Config_kF(0, 0, 10); //LAST: 0.0
-    this->m_pTurretServo->Config_kP(0, 1.2, 10); //LAST: 0.8
-    this->m_pTurretServo->Config_kI(0, 0.0, 10); //LAST: 0.0
-    this->m_pTurretServo->Config_kD(0, 6.0, 10); //LAST: 0.0
+    this->m_pTurretServo->Config_kF(0, 0.5, 10); //LAST: 0.5
+    this->m_pTurretServo->Config_kP(0, 0.4, 10); //LAST: 0.4
+    this->m_pTurretServo->Config_kI(0, 0.002, 10); //LAST: 0.0
+    this->m_pTurretServo->Config_kD(0, 4.0, 10); //LAST: 6.0
+    this->m_pTurretServo->Config_IntegralZone(0, 1000, 10);
 
     //Motion Profile Properties to avoid jerky movements
-    this->m_pTurretServo->ConfigMotionCruiseVelocity(1200, 10);
-    this->m_pTurretServo->ConfigMotionAcceleration(800, 0);
+    this->m_pTurretServo->ConfigMotionCruiseVelocity(3200, 10);
+    this->m_pTurretServo->ConfigMotionAcceleration(1600, 0);
+
+    //Start Delayed Vision Timer
+    this->mVisionUpdateTimer.Start();
 }
 
 /**
@@ -56,20 +63,31 @@ double Turret::GetRawXPixel() {
     return frc::SmartDashboard::GetNumber("visionTargetXPos", -1);
 }
 
+double Turret::GetDelayedXPixel() {
+    if (this->mVisionUpdateTimer.HasPeriodPassed(this->mDelayedVisionWaitSeconds))
+    {
+        this->mVisionUpdateTimer.Reset();
+        this->mVisionUpdateTimer.Start();
+        this->mLastXPixel = this->GetRawXPixel();
+    }
+    return this->mLastXPixel;
+}
+
 
 /**
  * Get the latest target pixel, then calculate the ratio of its position on the camera frame
  */
 double Turret::GetFOVXFactor() {
+//    double rawXPixel = this->GetDelayedXPixel();
     double rawXPixel = this->GetRawXPixel();
-    return rawXPixel * this->mCameraFOVXResRatio - 1;
+    return 1 - rawXPixel * this->mCameraFOVXResRatio;
 }
 
 /**
  * Use the provided pixel to calculate the ratio of its position on the camera frame
  */
 double Turret::GetFOVXFactor(double rawXPixel) {
-    return rawXPixel * this->mCameraFOVXResRatio - 1;
+    return 1 - rawXPixel * this->mCameraFOVXResRatio;
 }
 
 /**
@@ -77,7 +95,7 @@ double Turret::GetFOVXFactor(double rawXPixel) {
  */
 double Turret::GetFOVXAngle() {
     double xFactor = this->GetFOVXFactor();
-    return xFactor * this->mCameraXFOV / 2;
+    return xFactor * (this->mCameraXFOV / 2);
 }
 
 /**
@@ -99,9 +117,15 @@ double Turret::GetTurretFrameAngle() {
  * Combines the turret-frame and target-turret angles
  */
 double Turret::GetTargetFrameAngle() {
-    return this->GetTurretFrameAngle() + this->GetFOVXAngle();
+    return (this->GetTurretFrameAngle() + this->GetFOVXAngle());
 }
 
+/**
+ * Combines the turret-frame and target-turret angles with a dampening multiplier
+ */
+double Turret::GetDampenedTargetFrameAngle() {
+    return (this->GetTurretFrameAngle() + this->GetFOVXAngle() * mTargetFrameAngleDamp);
+}
 
 /**
  * Returns false when GetRawPixel is negative (indicating no lock from LemonLight)
@@ -189,11 +213,11 @@ bool Turret::GetHomed() {
 void Turret::SetTurretAngle(double requestAngle) {
 
     if (this->GetHomed()) {
-    //If we're at home,
+    //If we're aware of turret position,
         if (abs(requestAngle) < this->mSoftLimitFromCenter) {
         //And the request is reasonable, satisfy it
             //Set requested angle
-            double targetEncoderPosition = requestAngle * this->mEncoderTicksPerDegree + this->mHomeFrameOffset * this->mEncoderTicksPerDegree;
+            double targetEncoderPosition = this->mHomeFrameOffset * this->mEncoderTicksPerDegree + requestAngle * this->mEncoderTicksPerDegree;
             this->m_pTurretServo->Set(ControlMode::MotionMagic, targetEncoderPosition);
         } else {
         //If the request is outside of bounds, we have to curtail it so we don't overshoot the soft limits
@@ -205,7 +229,7 @@ void Turret::SetTurretAngle(double requestAngle) {
                 requestAngle = -1 * this->mSoftLimitFromCenter;
             }
             //Set Requested angle
-            double targetEncoderPosition = requestAngle * this->mEncoderTicksPerDegree + this->mHomeFrameOffset * this->mEncoderTicksPerDegree;
+            double targetEncoderPosition =  this->mHomeFrameOffset * this->mEncoderTicksPerDegree + requestAngle * this->mEncoderTicksPerDegree;
             this->m_pTurretServo->Set(ControlMode::MotionMagic, targetEncoderPosition);
         }
         
@@ -213,6 +237,10 @@ void Turret::SetTurretAngle(double requestAngle) {
     
 
     
+}
+
+void Turret::SetTurretVelocity(double velocity) {
+    this->m_pTurretServo->Set(ControlMode::Velocity, velocity);
 }
 
 /**
@@ -223,7 +251,7 @@ void Turret::SetTurretAngle(double requestAngle) {
  */
 bool Turret::AutoTurret() {
     if (this->GetTargetTracked()) {
-        this->SetTurretAngle(this->GetTargetFrameAngle());
+        this->SetTurretAngle(this->GetDampenedTargetFrameAngle());
         if (this->GetTurretLocked()) {
             return true;
         } else {
@@ -244,4 +272,8 @@ bool Turret::AutoTurret() {
  */
 void Turret::SetTurretPower(double power) {
     this->m_pTurretServo->Set(ControlMode::PercentOutput, power);
+}
+
+void Turret::DisableTurret() {
+    this->m_pTurretServo->Set(ControlMode::PercentOutput, 0);
 }

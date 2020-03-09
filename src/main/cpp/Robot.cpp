@@ -50,7 +50,7 @@ void Robot::RobotInit() {
   this->m_pFeeder = new Feeder(17);
 
   //Master Ball System
-  this->m_pBallSystem = new BallSystem(this->m_pElevator, this->m_pTestShooter, this->m_pTestTurret, this->m_pIntakeArm);
+  this->m_pBallSystem = new BallSystem(this->m_pElevator, this->m_pFeeder, this->m_pTestShooter, this->m_pTestTurret, this->m_pIntakeArm);
 
   //Intake System
   this->m_pIntakeArm = new IntakeArm(24);
@@ -144,12 +144,51 @@ void Robot::TeleopPeriodic() {
   //Disable BOOST for new drivers
 //      this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
 //      this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
-    this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), 0);
-    this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), 0);
+    
+  //Drive Code
+  this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), 0);
+  this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), 0);
+
+  //Shoot code
+  this->m_pBallSystem->AutoVolley(this->m_pPrimaryController->getRawButton(6), this->m_pPrimaryController->getRawButton(5));
+
+    //Crude (read: final) intake code
+    if (this->m_pPrimaryController->getRTrigger() > 0.25)
+    {
+      this->m_pElevator->ElevatorForward();
+    }
+    else if (this->m_pPrimaryController->getLTrigger() > 0.25)
+    {
+      this->m_pElevator->ElevatorReverse();
+    }
+    else if (!this->m_pPrimaryController->getRawButton(6))
+    {
+      this->m_pElevator->ElevatorStop();
+    }
+
+
+
+    /**
+  if (this->m_pPrimaryController->getRawButton(6))
+  {
+    if (this->m_pTestTurret->AutoTurret()) {
+      if (this->m_pTestShooter->AutoRPM()) {
+        this->m_pFeeder->FeedForward();
+      }
+      else
+      {
+        this->m_pFeeder->FeedStop();
+      }
+    }
+  }
+  
 
   if (this->m_pPrimaryController->getRawButton(5)) {
     this->m_pTestShooter->DisableShooter();
+    this->m_pTestTurret->DisableTurret();
+    this->m_pFeeder->FeedStop();
   }
+  
 
   if (this->m_pPrimaryController->getRawButton(3)) {
     this->m_pFeeder->FeedForward();
@@ -158,21 +197,7 @@ void Robot::TeleopPeriodic() {
     this->m_pFeeder->FeedStop();
     this->m_pElevator->ElevatorStop();
   }
-
-  //Crude (read: final) intake code
-  if (this->m_pPrimaryController->getRTrigger() > 0.25)
-  {
-    this->m_pElevator->ElevatorForward();
-  }
-  else if (this->m_pPrimaryController->getLTrigger() > 0.25)
-  {
-    this->m_pElevator->ElevatorReverse();
-  }
-  else if (!this->m_pPrimaryController->getRawButton(3))
-  {
-    this->m_pElevator->ElevatorStop();
-  }
-
+  */
 
 
 
@@ -196,9 +221,9 @@ void Robot::TestPeriodic() {
 
   double currentRPM = m_pTestShooter->GetShooterRPM();
   double newRPM = currentRPM + 10 * this->m_pPrimaryController->getJoyY() * -1;
-  frc::SmartDashboard::PutNumber("DB/Slider 1", newRPM / 1000);
-  frc::SmartDashboard::PutNumber("DB/Slider 2", this->m_pTestShooter->GetTargetDistance());
-  frc::SmartDashboard::PutNumber("DB/Slider 3", this->m_pTestShooter->GetTargetCalculatedRPM());
+//  frc::SmartDashboard::PutNumber("DB/Slider 1", newRPM / 1000);
+//  frc::SmartDashboard::PutNumber("DB/Slider 2", this->m_pTestShooter->GetTargetDistance());
+//  frc::SmartDashboard::PutNumber("DB/Slider 3", this->m_pTestShooter->GetTargetCalculatedRPM());
 
 
   this->m_pTestShooter->ToggleAutoRPM(this->m_pPrimaryController->getRawButton(6), this->m_pPrimaryController->getRawButton(5));
@@ -206,6 +231,7 @@ void Robot::TestPeriodic() {
     frc::SmartDashboard::PutBoolean("DB/LED 0", false);
     frc::SmartDashboard::PutBoolean("DB/LED 1", false);
     frc::SmartDashboard::PutBoolean("DB/LED 2", false);
+    frc::SmartDashboard::PutBoolean("DB/LED 3", false);
 
   if (this->m_pPrimaryController->getRawButton(3)) {
     this->m_pFeeder->FeedForward();
@@ -215,10 +241,21 @@ void Robot::TestPeriodic() {
     this->m_pElevator->ElevatorStop();
   }
 
+
+  frc::SmartDashboard::PutBoolean("DB/LED 0", this->m_pTestTurret->GetTargetTracked());
+  frc::SmartDashboard::PutNumber("DB/Slider 0", this->m_pTestTurret->GetFOVXFactor());
+  frc::SmartDashboard::PutNumber("DB/Slider 1", this->m_pTestTurret->GetFOVXAngle());
+  frc::SmartDashboard::PutNumber("DB/Slider 2", this->m_pTestTurret->GetTurretFrameAngle());
+  frc::SmartDashboard::PutNumber("DB/Slider 3", this->m_pTestTurret->GetTargetFrameAngle());
+
   //Crude Turret code
   if (this->m_pPrimaryController->getRawButton(1))
   {
     this->m_pTestTurret->AutoTurret();
+  }
+  else if (this->m_pPrimaryController->getRawButton(2))
+  {
+    this->m_pTestTurret->SetTurretAngle(this->m_pPrimaryController->getJoyX() * 60);
   }
   else
   {
