@@ -126,93 +126,39 @@ void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
 
   /**
-   * This line will take raw input from the joystick and pass it to the motor controllers;
-   * Kept here as LAST RESORT in case motion control breaks
-   * m_pTankDrive.setTankDrivePower((0.75 * m_pPrimaryController->getJoyY()), (m_pPrimaryController->getJoyX() * 0.45));
-   */
-
-
-  /**
    * VelocityTank will hold the wheels at a velocity, set in meters per second
    * Boost will increase this speed, but reduce steering
    * Currently, either the integral accumulator or (more likely) a combination of Boost and maximum velocity not being reached
    * prevents the robot from decelerating on demand. Fix this when you have a working drive base.
    */
 
+  //AutoTurret Demonstration
   this->m_pTestShooter->ToggleAutoRPM(this->m_pPrimaryController->getRawButton(6), this->m_pPrimaryController->getRawButton(5));
 
   //Disable BOOST for new drivers
 //      this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
 //      this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
     
-  //Drive Code
+  //Drive Code without boost
   this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), 0);
   this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), 0);
 
   //Shoot code
   this->m_pBallSystem->AutoVolley(this->m_pPrimaryController->getRawButton(6), this->m_pPrimaryController->getRawButton(5));
 
-    //Crude (read: final) intake code
-    if (this->m_pPrimaryController->getRTrigger() > 0.25)
-    {
-      this->m_pElevator->ElevatorForward();
-    }
-    else if (this->m_pPrimaryController->getLTrigger() > 0.25)
-    {
-      this->m_pElevator->ElevatorReverse();
-    }
-    else if (!this->m_pPrimaryController->getRawButton(6))
-    {
-      this->m_pElevator->ElevatorStop();
-    }
-
-
-
-    /**
-  if (this->m_pPrimaryController->getRawButton(6))
+  //Crude (read: probably final) intake code
+  if (this->m_pPrimaryController->getRTrigger() > 0.25)
   {
-    if (this->m_pTestTurret->AutoTurret()) {
-      if (this->m_pTestShooter->AutoRPM()) {
-        this->m_pFeeder->FeedForward();
-      }
-      else
-      {
-        this->m_pFeeder->FeedStop();
-      }
-    }
-  }
-  
-
-  if (this->m_pPrimaryController->getRawButton(5)) {
-    this->m_pTestShooter->DisableShooter();
-    this->m_pTestTurret->DisableTurret();
-    this->m_pFeeder->FeedStop();
-  }
-  
-
-  if (this->m_pPrimaryController->getRawButton(3)) {
-    this->m_pFeeder->FeedForward();
     this->m_pElevator->ElevatorForward();
-  } else {
-    this->m_pFeeder->FeedStop();
-    this->m_pElevator->ElevatorStop();
   }
-  */
-
-
-
-  
-
-/**
-  if (this->m_pPrimaryController->getRawButton(1)) {
-    this->m_pElevator->ElevatorStop();
-  } else if (this->m_pPrimaryController->getRawButton(2)) {
+  else if (this->m_pPrimaryController->getLTrigger() > 0.25)
+  {
     this->m_pElevator->ElevatorReverse();
-  } else {
-    this->m_pElevator->ElevatorForward();
   }
-  */
-
+  else if (!this->m_pPrimaryController->getRawButton(6))
+  {
+    this->m_pElevator->ElevatorStop();
+  }
 }
 
 
@@ -243,10 +189,10 @@ void Robot::TestPeriodic() {
 
 
   frc::SmartDashboard::PutBoolean("DB/LED 0", this->m_pTestTurret->GetTargetTracked());
-  frc::SmartDashboard::PutNumber("DB/Slider 0", this->m_pTestTurret->GetFOVXFactor());
   frc::SmartDashboard::PutNumber("DB/Slider 1", this->m_pTestTurret->GetFOVXAngle());
   frc::SmartDashboard::PutNumber("DB/Slider 2", this->m_pTestTurret->GetTurretFrameAngle());
   frc::SmartDashboard::PutNumber("DB/Slider 3", this->m_pTestTurret->GetTargetFrameAngle());
+  frc::SmartDashboard::PutNumber("DB/Slider 0", this->m_pTestTurret->GetRawXPixel());
 
   //Crude Turret code
   if (this->m_pPrimaryController->getRawButton(1))

@@ -82,9 +82,9 @@ class Turret {
     //Holds last position
     double mLastXPixel = 0;
     //Update Frequency
-    const double mDelayedVisionWaitSeconds = 2;
+    const double mDelayedVisionWaitSeconds = 0.5;
     //Dampening on vision X angle (effective Kp for vision)
-    const double mTargetFrameAngleDamp = 0.2;
+    const double mTargetFrameAngleDamp = 0.1;
 
 //Global Constants
     //Camera Resolution

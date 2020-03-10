@@ -50,7 +50,7 @@ Turret::Turret(int CANID) {
 
     //Motion Profile Properties to avoid jerky movements
     this->m_pTurretServo->ConfigMotionCruiseVelocity(3200, 10);
-    this->m_pTurretServo->ConfigMotionAcceleration(1600, 0);
+    this->m_pTurretServo->ConfigMotionAcceleration(2400, 0);
 
     //Start Delayed Vision Timer
     this->mVisionUpdateTimer.Start();

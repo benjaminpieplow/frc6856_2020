@@ -32,7 +32,7 @@ void BallSystem::AutoVolley(bool enableButton, bool disableButton) {
     {   //Latch on
     this->mAutoVolleyLatch = true;
         if (this->m_pTurret->AutoTurret())
-        {   //If the turret is up to speed,
+        {   //If the turret locked,
             if (this->m_pShooter->AutoRPM())
             {   //If the shooter is up to speed
                 if (enableButton)
@@ -46,6 +46,18 @@ void BallSystem::AutoVolley(bool enableButton, bool disableButton) {
                     this->m_pElevator->ElevatorStop();
                 }
             }
+            else
+            {   //If the shooter is not at speed
+                this->m_pFeeder->FeedStop();    //Do not feed
+                this->m_pElevator->ElevatorStop();
+            }
+            
         }
+        else
+        {   //If the turret is notlocked
+            this->m_pFeeder->FeedStop();    //Do not feed
+            this->m_pElevator->ElevatorStop();
+        }
+        
     }
 }
