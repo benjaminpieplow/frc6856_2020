@@ -29,9 +29,9 @@ class IntakeArm {
     private:
 
     //Intake Arm Power Setpoints
-    const double mIntakeRaisePower = -0.15;
-    const double mIntakeHoldPower = 0.03;
-    const double mIntakeLowerPower = 0.10;
+    const double mIntakeRaisePower = -0.25;
+    const double mIntakeHoldPower = -0.08;
+    const double mIntakeLowerPower = 0.20;
     //Action Time Setpoints
     const double mIntakeRaiseTime = 2;
     const double mIntakeLowerTime = 1;

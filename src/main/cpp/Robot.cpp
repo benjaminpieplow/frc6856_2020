@@ -164,7 +164,7 @@ void Robot::TeleopPeriodic() {
 
 void Robot::TestPeriodic() {
 
-
+/**
   double currentRPM = m_pTestShooter->GetShooterRPM();
   double newRPM = currentRPM + 10 * this->m_pPrimaryController->getJoyY() * -1;
 //  frc::SmartDashboard::PutNumber("DB/Slider 1", newRPM / 1000);
@@ -188,12 +188,6 @@ void Robot::TestPeriodic() {
   }
 
 
-  frc::SmartDashboard::PutBoolean("DB/LED 0", this->m_pTestTurret->GetTargetTracked());
-  frc::SmartDashboard::PutNumber("DB/Slider 1", this->m_pTestTurret->GetFOVXAngle());
-  frc::SmartDashboard::PutNumber("DB/Slider 2", this->m_pTestTurret->GetTurretFrameAngle());
-  frc::SmartDashboard::PutNumber("DB/Slider 3", this->m_pTestTurret->GetTargetFrameAngle());
-  frc::SmartDashboard::PutNumber("DB/Slider 0", this->m_pTestTurret->GetRawXPixel());
-
   //Crude Turret code
   if (this->m_pPrimaryController->getRawButton(1))
   {
@@ -208,17 +202,29 @@ void Robot::TestPeriodic() {
     this->m_pTestTurret->SetTurretPower(this->m_pPrimaryController->getJoyX());
   }
   
-
-//    frc::SmartDashboard::PutBoolean("DB/LED 3", false);
-
-/**
- if (visionTargetXPos < 0) {
-   this->m_pTestTurret->SetTurretPower(0);
- } else {
-   this->m_pTestTurret->SetTurretPower(visionTargetXRatio);
- }
 */
 
+  frc::SmartDashboard::PutBoolean("DB/LED 0", this->m_pTestTurret->GetTargetTracked());
+  frc::SmartDashboard::PutNumber("DB/Slider 1", this->m_pTestTurret->GetFOVXAngle());
+  frc::SmartDashboard::PutNumber("DB/Slider 2", this->m_pTestTurret->GetTurretFrameAngle());
+  frc::SmartDashboard::PutNumber("DB/Slider 3", this->m_pTestTurret->GetTargetFrameAngle());
+  frc::SmartDashboard::PutNumber("DB/Slider 0", this->m_pTestTurret->GetRawXPixel());
+
+
+  if (this->m_pPrimaryController->getRawButton(1))
+  {
+    this->m_pIntakeArm->RaiseIntake();
+  }
+  else if (this->m_pPrimaryController->getRawButton(2))
+  {
+    this->m_pIntakeArm->LowerIntake();
+  }
+  else
+  {
+    this->m_pIntakeArm->IntakePeriodic();
+  }
+  
+  
 
 /*
   if (this->m_pPrimaryController->getRawButton(1)) {

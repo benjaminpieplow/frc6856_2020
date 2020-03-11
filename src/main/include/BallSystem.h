@@ -14,7 +14,6 @@ class BallSystem
 public:
     BallSystem(Elevator* pElevatorPointer, Feeder* pFeeder, Shooter* pShooterPointer, Turret* pTurretPointer, IntakeArm* m_pIntakeArm);
     ~BallSystem();
-
     
     void StartIntake();
 

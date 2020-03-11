@@ -12,6 +12,8 @@ IntakeArm::IntakeArm(int armCANID) {
     this->m_pIntakeMotor->ConfigFactoryDefault();
     
     this->m_pIntakeMotor->SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode::Brake);
+    this->m_pIntakeMotor->ConfigVoltageCompSaturation(10, 10);
+    this->m_pIntakeMotor->EnableVoltageCompensation(true);
 
 }
 
