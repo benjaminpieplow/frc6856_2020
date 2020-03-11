@@ -16,6 +16,7 @@ class ControllerInput
     //Returns Joystick Y Axis
     double getJoyY();
 
+    //Returns a bool for a specified button
     bool getRawButton(int button);
 
     //Returns right trigger
@@ -38,3 +39,25 @@ class ControllerInput
     frc::Joystick* m_pController;
 
 };
+
+class JoystickInput
+{
+public:
+    JoystickInput(int controllerID);
+    ~JoystickInput();
+
+
+    //Returns Joystick X Axis
+    double getJoyX();
+
+    //Returns Joystick Y Axis
+    double getJoyY();
+
+    //Returns a bool for a specified button
+    bool getRawButton(int button);
+
+private:
+    frc::Joystick* m_pJoystick;
+
+};
+

@@ -50,7 +50,7 @@ class Robot : public frc::TimedRobot {
 
 //  TankDrive m_pTankDrive;
   ControllerInput* m_pPrimaryController;
-  ControllerInput* m_pSecondaryController;
+  JoystickInput* m_pSecondaryController;
 
   AdvancedDrive* m_pLeftTrack;
   AdvancedDrive* m_pRightTrack;

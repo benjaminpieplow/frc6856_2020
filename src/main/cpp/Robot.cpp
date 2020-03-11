@@ -32,7 +32,7 @@ void Robot::RobotInit() {
   //Initialize Objects
   //ToDo: Make this a map file
   this->m_pPrimaryController = new ControllerInput(0);
-  this->m_pSecondaryController = new ControllerInput(1);
+  this->m_pSecondaryController = new JoystickInput(1);
 
   this->m_pLeftTrack = new AdvancedDrive(10, 11, true);
   this->m_pRightTrack = new AdvancedDrive(12, 13, false);
@@ -124,14 +124,7 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-
-  /**
-   * VelocityTank will hold the wheels at a velocity, set in meters per second
-   * Boost will increase this speed, but reduce steering
-   * Currently, either the integral accumulator or (more likely) a combination of Boost and maximum velocity not being reached
-   * prevents the robot from decelerating on demand. Fix this when you have a working drive base.
-   */
-
+  
   //AutoTurret Demonstration
   this->m_pTestShooter->ToggleAutoRPM(this->m_pPrimaryController->getRawButton(6), this->m_pPrimaryController->getRawButton(5));
 
