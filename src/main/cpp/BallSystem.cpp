@@ -30,11 +30,11 @@ void BallSystem::BallSystemPeriodic() {
     {   //If Turret not in Manual Override 
         this->AutoVolley(this->m_pSecondaryController->getRawButton(1), this->m_pSecondaryController->getRawButton(3));
             
-        if (this->m_pPrimaryController->getRawButton(6))
+        if (this->m_pPrimaryController->getRTriggerBool())
         {   //If driver wants intake
             this->m_pElevator->ElevatorForward();
         }
-        else if (this->m_pPrimaryController->getRawButton(5))
+        else if (this->m_pPrimaryController->getLTriggerBool())
         {   //If driver wants balls out
             this->m_pElevator->ElevatorReverse();
         }
@@ -69,11 +69,11 @@ void BallSystem::BallSystemPeriodic() {
         }
 
         //Elevintake Control
-        if (this->m_pPrimaryController->getRawButton(5))
+        if (this->m_pPrimaryController->getLTriggerBool())
         {   //If driver wants intake reverse
             this->m_pElevator->ElevatorReverse();
         }
-        else if (this->m_pSecondaryController->getRawButton(1) || this->m_pPrimaryController->getRawButton(6))
+        else if (this->m_pSecondaryController->getRawButton(1) || this->m_pPrimaryController->getRTriggerBool())
         {   //If either operator or driver want intake fwd
             this->m_pElevator->ElevatorForward();
         }
@@ -127,6 +127,7 @@ void BallSystem::AutoVolley(bool enableButton, bool disableButton) {
         }
         else
         {   //If the turret is not locked
+            this->m_pShooter->DisableShooter();
             this->m_pFeeder->FeedStop();    //Do not feed
             this->m_pElevator->ElevatorStop();
         }

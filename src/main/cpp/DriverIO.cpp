@@ -49,6 +49,37 @@ double ControllerInput::getLTrigger() {
     return this->m_pController->GetRawAxis(2);
 }
 
+/**
+ * Converts the analog trigger into a bool
+ */
+bool ControllerInput::getRTriggerBool() {
+    if (this->getRTrigger() > 0.25) {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    
+}
+
+/**
+ * Converts the analog trigger into a bool
+ */
+bool ControllerInput::getLTriggerBool() {
+    if (this->getLTrigger() > 0.25) {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    
+}
+
+
+
+
 
 /**
  * Code for a flight joystick

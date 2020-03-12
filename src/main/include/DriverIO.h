@@ -25,6 +25,11 @@ class ControllerInput
     //Returns left trigger
     double getLTrigger();
 
+    //Returns a bool
+    bool getRTriggerBool();
+
+    bool getLTriggerBool();
+
 
 
     //Sets Left Rumble
