@@ -12,10 +12,37 @@
 #include <Turret.h>
 #include <Elevator.h>
 #include <Feeder.h>
+#include <BallSystem.h>
 
 #include <frc/Timer.h>
 
 #include <frc/smartdashboard/SmartDashboard.h>
+
+class BasicAuton
+{
+public:
+    BasicAuton();
+    ~BasicAuton();
+
+    int GetStage();
+    void ResetBasicAuton();
+
+    void RunStage00(BallSystem* pBallSystem);
+    void RunStage01(BallSystem* pBallSystem);
+    void RunStage02(AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive);
+
+private:
+    frc::Timer mStageTimer;
+    bool mStageStarted = false;
+    int mProgramStage = 0;
+
+    double stage00Delay = 3;    //Hold for X seconds
+    double stage01Delay = 3;    //Fire for X seconds
+    double stage02Distance = 2; //Move X meters forward
+};
+
+
+
 
 class CrudeAuton
 {
@@ -37,7 +64,7 @@ private:
 class Autonomous
 {
 public:
-    Autonomous(Turret* pTurret, Shooter* pShooter, AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive, Elevator* pElevator, Feeder* pFeeder);
+    Autonomous(Turret* pTurret, Shooter* pShooter, AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive, Elevator* pElevator, Feeder* pFeeder, BallSystem* pBallSystem);
     ~Autonomous();
 
     /**
@@ -50,6 +77,11 @@ public:
     void CrudeAutonInit();
     void CrudeAutonPeriodic();
 
+    void BasicAutonInit();
+    void BasicAutonPeriodic();
+
+
+
 private:
 
     //Pointers to Robot System Objects
@@ -59,8 +91,10 @@ private:
     AdvancedDrive* m_pRightDrive;
     Elevator* m_pElevator;
     Feeder* m_pFeeder;
+    BallSystem* m_pBallSystem;
 
     //Pointers to Auton Systems
     CrudeAuton* m_pCrudeAuton;
+    BasicAuton* m_pBasicAuton;
 };
 

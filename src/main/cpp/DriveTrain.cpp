@@ -48,20 +48,29 @@ AdvancedDrive::AdvancedDrive(int masterCANID, int slaveCANID, bool inverted) {
     this->pMasterTalonSRX = new WPI_TalonSRX(masterCANID);
     this->pSlaveTalonSRX = new WPI_TalonSRX(slaveCANID);
 
+    //Nuke'n'load
     this->pMasterTalonSRX->ConfigFactoryDefault();
     this->pSlaveTalonSRX->ConfigFactoryDefault();
 
+    //Don't let low voltage interfere with PID
     this->pMasterTalonSRX->ConfigVoltageCompSaturation(10,10);
+    this->pMasterTalonSRX->EnableVoltageCompensation(true);
     this->pSlaveTalonSRX->ConfigVoltageCompSaturation(10,10);
+    this->pSlaveTalonSRX->EnableVoltageCompensation(true);
 
+    //Leverage mechanically locked motors
     this->pSlaveTalonSRX->Follow(*this->pMasterTalonSRX);
 
+    //Flip drivetrain (for L/R track)
     if (inverted) {
         this->pMasterTalonSRX->SetInverted(true);
         this->pSlaveTalonSRX->SetInverted(true);
     }
 }
 
+/**
+ * Pretty bad, just ramps voltage. Don't use.
+ */
 void AdvancedDrive::InitSimpleRampedControl() {
     this->pMasterTalonSRX->ConfigVoltageCompSaturation(10, 10);
     this->pSlaveTalonSRX->ConfigVoltageCompSaturation(10, 10);
@@ -71,6 +80,9 @@ void AdvancedDrive::InitSimpleRampedControl() {
     this->pMasterTalonSRX->ConfigOpenloopRamp(0.5);
 }
 
+/**
+ * Makes the robot angry.
+ */
 void AdvancedDrive::InitCurrentControl() {
     this->pMasterTalonSRX->ConfigVoltageCompSaturation(10, 10);
     this->pSlaveTalonSRX->ConfigVoltageCompSaturation(10, 10);
@@ -84,15 +96,25 @@ void AdvancedDrive::InitCurrentControl() {
 
 }
 
-
+/**
+ * In case PID breaks or you lose an encoder
+ */
 void AdvancedDrive::SetPWM(double power) {
     this->pMasterTalonSRX->Set(ControlMode::PercentOutput, power);
 }
 
+/**
+ * Continues to anger robot
+ */
 void AdvancedDrive::SetCurrent(double power) {
     this->pMasterTalonSRX->Set(ControlMode::Current, power);
 }
 
+/**
+ * Replaced by BOOSTED VelocityTank
+ * Drives robot using ramped velocity held by PID
+ * Metric, because we're in Canadia
+ */
 void AdvancedDrive::VelocityTank(double joyX, double joyY) {
     //Speed (in meters per second) drivers want as maximums
     const double targetXVelocity = 1;
@@ -197,6 +219,9 @@ void AdvancedDrive::VelocityTank(double joyX, double joyY, double joyBoost) {
     
 }
 
+/**
+ * Preps Talons for VelocityControl
+ */
 void AdvancedDrive::InitVelocityControl() {
     this->pMasterTalonSRX->ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
     //this->pTalonSRX->ConfigSelectedFeedbackCoefficient();

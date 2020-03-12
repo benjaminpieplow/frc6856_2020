@@ -2,6 +2,8 @@
  * Simplified control of the entire ball system, leveraging APIs from the subsystems
  */
 
+#pragma once
+
 //#include <Intake.h>
 #include <Elevator.h>
 #include <Feeder.h>

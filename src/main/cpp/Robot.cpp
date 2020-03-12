@@ -24,9 +24,11 @@
 
 
 void Robot::RobotInit() {
-  m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
-  m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
-  frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+
+  m_chooser.AddOption("Shoot 3, Move", "BasicAuton");
+  m_chooser.AddOption("Pit - Reset Robot", "Reset");
+  m_chooser.SetDefaultOption("Shoot 3, Move", "BasicAuton");
+  frc::SmartDashboard::PutData(m_chooser);
 
 
   //Initialize Objects
@@ -59,7 +61,7 @@ void Robot::RobotInit() {
   this->m_pLiftSystem = new LiftSystem(27);
 
   //Autonomous system - controls robot during Autonomous
-  this->m_pAuton = new Autonomous(this->m_pTestTurret, this->m_pTestShooter, this->m_pLeftTrack, this->m_pRightTrack, this->m_pElevator, m_pFeeder);
+  this->m_pAuton = new Autonomous(this->m_pTestTurret, this->m_pTestShooter, this->m_pLeftTrack, this->m_pRightTrack, this->m_pElevator, this->m_pFeeder, this->m_pBallSystem);
 
   //Init PIDs for Drivetrain
   this->m_pLeftTrack->InitVelocityControl();
@@ -99,18 +101,17 @@ void Robot::RobotPeriodic() {}
  * make sure to add them to the chooser code above as well.
  */
 void Robot::AutonomousInit() {
-  /**
-   * Original Auton
-  m_autoSelected = m_chooser.GetSelected();
-  // m_autoSelected = SmartDashboard::GetString("Auto Selector",
-  //     kAutoNameDefault);
-  std::cout << "Auto selected: " << m_autoSelected << std::endl;
+  std::string selectedAuton = frc::SmartDashboard::GetString("Auto Selector", "None");
 
-  if (m_autoSelected == kAutoNameCustom) {
-    // Custom Auto goes here
-      } else {
+  switch (selectedAuton)
+  {
+  case "Shoot 3, Move":
+    frc::SmartDashboard::PutBoolean("DB/LED 0", true);
+    break;
+  
+  default:
+    break;
   }
-  */
   this->m_pAuton->CrudeAutonInit();
 }
 
