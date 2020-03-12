@@ -50,7 +50,7 @@ void Robot::RobotInit() {
   this->m_pFeeder = new Feeder(17);
 
   //Master Ball System
-  this->m_pBallSystem = new BallSystem(this->m_pElevator, this->m_pFeeder, this->m_pTestShooter, this->m_pTestTurret, this->m_pIntakeArm);
+  this->m_pBallSystem = new BallSystem(this->m_pElevator, this->m_pFeeder, this->m_pTestShooter, this->m_pTestTurret, this->m_pIntakeArm, this->m_pPrimaryController, this->m_pSecondaryController);
 
   //Intake System
   this->m_pIntakeArm = new IntakeArm(24);
@@ -124,9 +124,6 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-  
-  //AutoTurret Demonstration
-  this->m_pTestShooter->ToggleAutoRPM(this->m_pPrimaryController->getRawButton(6), this->m_pPrimaryController->getRawButton(5));
 
   //Disable BOOST for new drivers
 //      this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
@@ -137,21 +134,38 @@ void Robot::TeleopPeriodic() {
   this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), 0);
 
   //Shoot code
-  this->m_pBallSystem->AutoVolley(this->m_pPrimaryController->getRawButton(6), this->m_pPrimaryController->getRawButton(5));
+//  this->m_pBallSystem->AutoVolley(this->m_pPrimaryController->getRawButton(6), this->m_pPrimaryController->getRawButton(5));
+  this->m_pBallSystem->BallSystemPeriodic();
 
-  //Crude (read: probably final) intake code
-  if (this->m_pPrimaryController->getRTrigger() > 0.25)
+
+  //Intake Arm Control
+  if (this->m_pPrimaryController->getRawButton(1))
   {
-    this->m_pElevator->ElevatorForward();
+    this->m_pIntakeArm->LowerIntake();
   }
-  else if (this->m_pPrimaryController->getLTrigger() > 0.25)
+  else if (this->m_pPrimaryController->getRawButton(2))
   {
-    this->m_pElevator->ElevatorReverse();
+    this->m_pIntakeArm->RaiseIntake();
   }
-  else if (!this->m_pPrimaryController->getRawButton(6))
+  else
   {
-    this->m_pElevator->ElevatorStop();
+    this->m_pIntakeArm->IntakePeriodic();
   }
+
+  //Lift System two-hand operation
+  if (this->m_pSecondaryController->getRawButton(6) && this->m_pSecondaryController->getRawButton(11))
+  {
+    this->m_pLiftSystem->LiftRaise();
+  }
+  else if (this->m_pSecondaryController->getRawButton(7) && this->m_pSecondaryController->getRawButton(10))
+  {
+    this->m_pLiftSystem->LiftClimb();
+  }
+  else
+  {
+    this->m_pLiftSystem->LiftStop();
+  }
+  
 }
 
 
@@ -204,55 +218,9 @@ void Robot::TestPeriodic() {
   frc::SmartDashboard::PutNumber("DB/Slider 0", this->m_pTestTurret->GetRawXPixel());
 
 
-  if (this->m_pPrimaryController->getRawButton(1))
-  {
-    this->m_pIntakeArm->RaiseIntake();
-  }
-  else if (this->m_pPrimaryController->getRawButton(2))
-  {
-    this->m_pIntakeArm->LowerIntake();
-  }
-  else
-  {
-    this->m_pIntakeArm->IntakePeriodic();
-  }
-  
-  
-
-/*
-  if (this->m_pPrimaryController->getRawButton(1)) {
-    if (this->m_pTestTurret->AutoTurret()) {
-      if (this->m_pTestShooter->AutoRPM()) {
-        this->m_pElevator->FeederForward();
-      } else {
-        this->m_pElevator->ElevatorStop();
-      }
-    }
-  } else {
-  }
-*/
-
-/**
-  if (this->m_pPrimaryController->getRawButton(3)) {
-    this->m_pElevator->FeederForward();
-  } else {
-    this->m_pElevator->FeederStop();
-  }
-  
+  this->m_pTestTurret->SetTurretPower(this->m_pSecondaryController->getJoyX());
 
 
-  if (this->m_pPrimaryController->getRawButton(5)) {
-    this->m_pIntakeSystem->RaiseIntake();
-  } else if (this->m_pPrimaryController->getRawButton(6)) {
-    this->m_pIntakeSystem->LowerIntake();
-  } else
-  {
-    this->m_pIntakeSystem->IntakePeriodic();
-  }
-
-  */
-
-  //this->m_pElevator->SetElevatorPower(this->m_pPrimaryController->getJoyX());
   
 }
 

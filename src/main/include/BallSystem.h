@@ -8,15 +8,22 @@
 #include <Shooter.h>
 #include <Turret.h>
 #include <IntakeArm.h>
+#include <DriverIO.h>
 
 class BallSystem
 {
 public:
-    BallSystem(Elevator* pElevatorPointer, Feeder* pFeeder, Shooter* pShooterPointer, Turret* pTurretPointer, IntakeArm* m_pIntakeArm);
+    BallSystem(Elevator* pElevatorPointer,
+    Feeder* pFeeder,
+    Shooter* pShooterPointer,
+    Turret* pTurretPointer,
+    IntakeArm* pIntakeArm,
+    ControllerInput* pPrimaryController,
+    JoystickInput* pSecondaryController);
     ~BallSystem();
-    
-    void StartIntake();
 
+    void BallSystemPeriodic();
+    
     void AutoVolley(bool enableButton, bool disableButton);
     
 private:
@@ -27,8 +34,13 @@ private:
     Shooter* m_pShooter;
     Turret* m_pTurret;
     IntakeArm* m_pIntakeArm;
+    ControllerInput* m_pPrimaryController;
+    JoystickInput* m_pSecondaryController;
 
+    bool mAutoTurretEnabled = true;
+
+    //Keep track of whether we're running an AutoVolley
     bool mAutoVolleyLatch = false;
-
+    //Track Active Task
     double taskStartTime = 0;
 };
