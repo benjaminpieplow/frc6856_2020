@@ -73,4 +73,6 @@ class Robot : public frc::TimedRobot {
 
   Feeder* m_pFeeder;
 
+  //Auton Modes for SendableChooser
+  enum AutonMode {BasicAuton, CrudeAuton, ResetRobot};
 };

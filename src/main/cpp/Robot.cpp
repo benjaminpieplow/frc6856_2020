@@ -28,7 +28,7 @@ void Robot::RobotInit() {
   m_chooser.AddOption("Shoot 3, Move", "BasicAuton");
   m_chooser.AddOption("Pit - Reset Robot", "Reset");
   m_chooser.SetDefaultOption("Shoot 3, Move", "BasicAuton");
-  frc::SmartDashboard::PutData(m_chooser);
+  frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
 
   //Initialize Objects
@@ -103,23 +103,25 @@ void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
   std::string selectedAuton = frc::SmartDashboard::GetString("Auto Selector", "None");
 
-  switch (selectedAuton)
-  {
-  case "Shoot 3, Move":
-    frc::SmartDashboard::PutBoolean("DB/LED 0", true);
-    break;
   
-  default:
-    break;
-  }
-  this->m_pAuton->CrudeAutonInit();
+
 }
 
 void Robot::AutonomousPeriodic() {
+  std::string selectedAuton = frc::SmartDashboard::GetString("Auto Selector", "None");
   frc::SmartDashboard::PutBoolean("DB/LED 0", false);
   frc::SmartDashboard::PutBoolean("DB/LED 1", false);
   frc::SmartDashboard::PutBoolean("DB/LED 2", false);
-  this->m_pAuton->CrudeAutonPeriodic();
+  
+
+  if (selectedAuton == "BasicAuton")
+  {
+    frc::SmartDashboard::PutBoolean("DB/LED 0", true);
+  }
+  if (selectedAuton == "Reset")
+  {
+    frc::SmartDashboard::PutBoolean("DB/LED 1", true);
+  }
 }
 
 void Robot::TeleopInit() {}
