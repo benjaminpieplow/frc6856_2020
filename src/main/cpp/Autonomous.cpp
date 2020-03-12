@@ -17,12 +17,17 @@ int BasicAuton::GetStage()
     return this->mProgramStage;
 }
 
-void BasicAuton::ResetBasicAuton()
+void BasicAuton::ResetBasicAuton(AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive)
 {
     this->mStageStarted = false;
     this->mProgramStage = false;
     this->mStageTimer.Stop();
     this->mStageTimer.Reset();
+    pLeftDrive->ZeroEncoder();
+    pLeftDrive->SetTargetVelocity(0);
+    pRightDrive->ZeroEncoder();
+    pRightDrive->SetTargetVelocity(0);
+
 }
 
 /**
@@ -31,80 +36,62 @@ void BasicAuton::ResetBasicAuton()
  */
 void BasicAuton::RunStage00(BallSystem* pBallSystem)
 {
-    //Arm and prepare LemonLight Targeting, don't fire yet
-    pBallSystem->AutoVolley(false, true);
-    
     if (!this->mStageStarted)
-    {   //If this is the first run
-        //Clear and start the timer
-        this->mStageTimer.Reset();
+    {   //If the stage is on its first run
+        this->mStageStarted = true;     //Don't run this code again
+        this->mStageTimer.Reset();      //Start the countdown
         this->mStageTimer.Start();
-        //Flag this stage as started
-        this->mStageStarted = true;
+        //Start the turret homing
+        pBallSystem->AutoVolley(true, false);
     }
     else if (this->mStageTimer.HasPeriodPassed(this->stage00Delay))
-    {   //If the stage has run its course
-        //Clear the timer for the next use
-        this->mStageTimer.Reset();
-        //Clear the Stage flag for the next guy
+    {   //If the stage is on its last run
         this->mStageStarted = false;
-        //Advance the stage
         this->mProgramStage = 1;
+    }
+    else
+    {   //Disable turret firing but keep homing
+        pBallSystem->AutoVolley(false, false);
     }
     
 }
 
 /**
  * Stage01: FIRE!
- * Home the LemonLight and energize turret while other robots do their thing
+ * Shoot for the target
  */
 void BasicAuton::RunStage01(BallSystem* pBallSystem)
 {
-    //Allow AutoVolley to lob balls at target
-    pBallSystem->AutoVolley(true, false);
-    
     if (!this->mStageStarted)
-    {   //If this is the first run
-        //Clear and start the timer
-        this->mStageTimer.Reset();
+    {   //If the stage is on its first run
+        this->mStageStarted = true;     //Don't run this code again
+        this->mStageTimer.Reset();      //Start the countdown
         this->mStageTimer.Start();
-        //Flag this stage as started
-        this->mStageStarted = true;
+        //FIRE!
+        pBallSystem->AutoVolley(true, false);
     }
     else if (this->mStageTimer.HasPeriodPassed(this->stage01Delay))
-    {   //If the stage has run its course
-        //Clear the timer for the next use
-        this->mStageTimer.Reset();
-        //Clear the Stage flag for the next guy
+    {   //If the stage is on its last run
         this->mStageStarted = false;
-        //Advance the stage
-        this->mProgramStage = 1;
+        this->mProgramStage = 2;
+        pBallSystem->AutoVolley(false, true);
     }
-    
+    else
+    {
+        //KEEP FIRING!
+        pBallSystem->AutoVolley(true, false);
+    }
 }
 
 /**
  * Final stage of BasicAuton, use Motion Magic to run distance set in Autonomous.h
  */
-void BasicAuton::RunStage02(AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive) {
-    if (!this->mStageStarted)
-    {   //If this is the first run of the stage
-        //Zero Encoders and reset drivetrain
-        pLeftDrive->ZeroEncoder();
-        pRightDrive->ZeroEncoder();
-        pLeftDrive->SetTargetMotionProfileTarget(0);
-        pRightDrive->SetTargetMotionProfileTarget(0);
-        //Mark stage as started
-        this->mStageStarted = true;
-    }
-    else
-    {   //If this is no the first run
-        //Yeah, if you could explain why these have to be flipped, that'd be GREAT
-        pLeftDrive->SetTargetMotionProfileTarget(this->stage02Distance * -1);
-        pRightDrive->SetTargetMotionProfileTarget(this->stage02Distance * -1);
-    }
-
+void BasicAuton::RunStage02(AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive)
+{
+    pLeftDrive->SetTargetMotionProfileTarget(this->stage02Distance);
+    pRightDrive->SetTargetMotionProfileTarget(this->stage02Distance);
 }
+
 
 /**
  * All robot functions are accessed via pointers, pointers are passed to the Autonomous system during object creation
@@ -179,13 +166,13 @@ void Autonomous::CrudeAutonPeriodic() {
  * Basically the same as CrudeAuton:
  * Spin up Shooter, fire for 5 seconds, move forward a meter
  * Leverages newer, more streamlined code
- * Stage 00 ->  Delay (for other teams)
- * Stage 01 ->  Spin up shooter
- * Stage 02 ->  Feed/Elevator AutoFire for 5 seconds
- * Stage 03 ->  Motion Magic -> to position
+ * Stage 00 ->  Delay (for other teams & to spin up shooter)
+ * Stage 01 ->  Feed/Elevator AutoFire for set seconds
+ * Stage 02 ->  Motion Magic -> to position
+ * Stage 03 ->  Wait for Teleop
  */
 void Autonomous::BasicAutonInit() {
-    this->m_pBasicAuton->ResetBasicAuton();
+    this->m_pBasicAuton->ResetBasicAuton(m_pLeftDrive, m_pRightDrive);
 }
 
 void Autonomous::BasicAutonPeriodic() {
@@ -196,6 +183,7 @@ void Autonomous::BasicAutonPeriodic() {
         break;
     case 1:
         this->m_pBasicAuton->RunStage01(m_pBallSystem);
+        break;
     case 2:
         this->m_pBasicAuton->RunStage02(m_pLeftDrive, m_pRightDrive);
     default:

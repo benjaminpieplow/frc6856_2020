@@ -171,7 +171,7 @@ bool Turret::GetHomed() {
         if (this->m_pTurretServo->GetSelectedSensorPosition(0) < this->mSoftLimitFromCenter * this->mEncoderTicksPerDegree) {
         //If we're still at home,
             //Keep going
-            this->SetTurretPower(0.2);
+            this->SetTurretPower(0.8);
             return false;
         } else {
         //If we've left home,
@@ -190,7 +190,7 @@ bool Turret::GetHomed() {
     else if
     (stickies.ForwardLimitSwitch || this->mForwardLimitTripped) {
     //If far-from-home switch has been hit
-        this->SetTurretPower(-0.2);
+        this->SetTurretPower(-0.35);
         this->mForwardLimitTripped = true;
 
         //Temporarily allow out-of-bounds running

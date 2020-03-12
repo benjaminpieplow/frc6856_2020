@@ -25,7 +25,7 @@ public:
     ~BasicAuton();
 
     int GetStage();
-    void ResetBasicAuton();
+    void ResetBasicAuton(AdvancedDrive* pLeftDrive, AdvancedDrive* pRightDrive);
 
     void RunStage00(BallSystem* pBallSystem);
     void RunStage01(BallSystem* pBallSystem);
@@ -36,12 +36,10 @@ private:
     bool mStageStarted = false;
     int mProgramStage = 0;
 
-    double stage00Delay = 3;    //Hold for X seconds
-    double stage01Delay = 3;    //Fire for X seconds
-    double stage02Distance = 2; //Move X meters forward
+    double stage00Delay = 7;    //Hold for X seconds
+    double stage01Delay = 3;    //Change if you want, it takes 2.5 seconds to empty the hopper
+    double stage02Distance = -1; //Move X meters forward
 };
-
-
 
 
 class CrudeAuton

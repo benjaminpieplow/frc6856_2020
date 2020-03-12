@@ -106,8 +106,6 @@ class Turret {
     //Offset between homing limit switch and turret zero (pointing directly backwards) in degrees, should be negative
     const double mHomeFrameOffset = 89.34; //Hacky limit switch offset
 
-    //Power with which to home (TODO: Update to velocity)
-    const double mHomeVelocity = 30;
 
     //Calculated Constants
     const double mCameraFOVXResRatio = 2 / this->mCameraXRes;

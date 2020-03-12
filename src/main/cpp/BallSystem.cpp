@@ -89,13 +89,15 @@ void BallSystem::BallSystemPeriodic() {
 }
 
 void BallSystem::AutoVolley(bool enableButton, bool disableButton) {
-    if (disableButton || !mAutoVolleyLatch)
+//    if (disableButton || !mAutoVolleyLatch)
+    if (disableButton)
     {   //If operator has stopped machine
         mAutoVolleyLatch = false;           //Don't re-start it
         //Shut off all the things
         this->m_pShooter->DisableShooter();
         this->m_pTurret->SetTurretAngle(0);
         this->m_pFeeder->FeedStop();
+        this->m_pElevator->ElevatorStop();
         //Note: Elevator may jam in "on" state. Refactor required to fix
     }
 

@@ -25,10 +25,10 @@
 
 void Robot::RobotInit() {
 
-  m_chooser.AddOption("Shoot 3, Move", "BasicAuton");
-  m_chooser.AddOption("Pit - Reset Robot", "Reset");
-  m_chooser.SetDefaultOption("Shoot 3, Move", "BasicAuton");
-  frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+  //List Auton Modes
+  std::string autonModes[3] = {"Shoot 3, Move", "Reset Climb/Turret", "Move"};
+  //Send to SmartDashBoard
+  frc::SmartDashboard::PutStringArray("Auto List", autonModes);
 
 
   //Initialize Objects
@@ -102,33 +102,38 @@ void Robot::RobotPeriodic() {}
  */
 void Robot::AutonomousInit() {
   std::string selectedAuton = frc::SmartDashboard::GetString("Auto Selector", "None");
-
-  
-
+  if (selectedAuton == "Shoot 3, Move")
+  {
+    this->m_pAuton->BasicAutonInit();
+  }
+  if (selectedAuton == "Reset Climb/Turret")
+  {
+  }
+    
 }
 
 void Robot::AutonomousPeriodic() {
+
   std::string selectedAuton = frc::SmartDashboard::GetString("Auto Selector", "None");
   frc::SmartDashboard::PutBoolean("DB/LED 0", false);
   frc::SmartDashboard::PutBoolean("DB/LED 1", false);
   frc::SmartDashboard::PutBoolean("DB/LED 2", false);
-  
 
-  if (selectedAuton == "BasicAuton")
+  if (selectedAuton == "Shoot 3, Move")
   {
-    frc::SmartDashboard::PutBoolean("DB/LED 0", true);
+    this->m_pAuton->BasicAutonPeriodic();
   }
-  if (selectedAuton == "Reset")
+  if (selectedAuton == "Reset Climb/Turret")
   {
-    frc::SmartDashboard::PutBoolean("DB/LED 1", true);
   }
+  
 }
 
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
 
-  //Disable BOOST for new drivers
+  //Disable BOOST because it's terrible
 //      this->m_pLeftTrack->VelocityTank(this->m_pPrimaryController->getJoyX() * -1, this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
 //      this->m_pRightTrack->VelocityTank(this->m_pPrimaryController->getJoyX(), this->m_pPrimaryController->getJoyY(), this->m_pPrimaryController->getRTrigger());
     
